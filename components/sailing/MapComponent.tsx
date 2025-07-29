@@ -126,15 +126,15 @@ export function MapComponent({
         outline: none;
       `;
       
-      // Enhanced hover and focus effects
+      // Enhanced hover and focus effects (avoid transform to prevent positioning issues)
       const applyHoverState = () => {
         el.style.background = 'hsl(var(--destructive))';
-        el.style.transform = 'scale(1.1)';
+        el.style.boxShadow = '0 6px 12px hsl(var(--destructive) / 0.4)';
       };
       
       const applyNormalState = () => {
         el.style.background = 'hsl(var(--primary))';
-        el.style.transform = 'scale(1)';
+        el.style.boxShadow = '0 4px 8px hsl(var(--primary) / 0.4)';
       };
       
       el.addEventListener('mouseenter', applyHoverState);
@@ -183,7 +183,7 @@ export function MapComponent({
       marker.on("dragstart", () => {
         const lngLat = marker.getLngLat();
         dragStartPositions.current.set(waypoint.id, lngLat);
-        el.style.transform = 'scale(1.1)';
+        el.style.boxShadow = '0 8px 16px hsl(var(--primary) / 0.6)';
         el.style.zIndex = '2000';
         el.setAttribute('aria-label', `Dragging waypoint ${index + 1}. Drop on water to move, or on land to cancel.`);
       });
@@ -207,7 +207,7 @@ export function MapComponent({
         const originalPosition = dragStartPositions.current.get(waypoint.id);
         
         // Reset visual state
-        el.style.transform = 'scale(1)';
+        el.style.boxShadow = '0 4px 8px hsl(var(--primary) / 0.4)';
         el.style.zIndex = '1000';
         el.style.background = 'hsl(var(--primary))';
         el.style.borderColor = 'hsl(var(--background))';
