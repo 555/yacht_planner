@@ -50,8 +50,8 @@ export function SailingCalculator() {
   }, []);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="text-center space-y-4">
+    <div className="flex flex-col h-screen p-6 space-y-6" data-component-path="components/sailing/SailingCalculator.tsx">
+      <div className="text-center space-y-4 flex-shrink-0">
         <h1 className="text-4xl font-bold text-foreground">
           Sailing Distance Calculator
         </h1>
@@ -61,7 +61,7 @@ export function SailingCalculator() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
         <div 
           className="lg:col-span-3 map-container" 
           data-lov-id="components/sailing/SailingCalculator.tsx:61:8"
