@@ -109,9 +109,13 @@ export function MapComponent({
       // Add click handler to remove waypoint (disabled during drag)
       el.addEventListener('click', (e) => {
         e.stopPropagation();
+        console.log('Marker click event - waypoint:', waypoint.id, 'isDragging:', dragStartPositions.current.has(waypoint.id));
         // Only allow removal if not currently dragging this marker
         if (!dragStartPositions.current.has(waypoint.id)) {
+          console.log('Removing waypoint:', waypoint.id);
           onRemoveWaypoint(waypoint.id);
+        } else {
+          console.log('Click blocked - marker is being dragged');
         }
       });
 
@@ -128,10 +132,10 @@ export function MapComponent({
       marker.on("dragstart", () => {
         const lngLat = marker.getLngLat();
         dragStartPositions.current.set(waypoint.id, lngLat);
+        console.log('DRAGSTART - waypoint:', waypoint.id, 'position:', lngLat, 'dragPositions size:', dragStartPositions.current.size);
         // Add visual feedback during drag
         el.style.transform = 'scale(1.1)';
         el.style.zIndex = '2000';
-        console.log('Drag started for waypoint', waypoint.id, 'at', lngLat);
       });
 
       // Add drag event for real-time visual feedback
@@ -151,6 +155,7 @@ export function MapComponent({
       marker.on("dragend", () => {
         const lngLat = marker.getLngLat();
         const originalPosition = dragStartPositions.current.get(waypoint.id);
+        console.log('DRAGEND - waypoint:', waypoint.id, 'newPosition:', lngLat, 'originalPosition:', originalPosition);
         
         // Reset visual feedback
         el.style.transform = 'scale(1)';
@@ -160,26 +165,31 @@ export function MapComponent({
         
         // Convert to screen coordinates for water detection
         const point = map.current!.project(lngLat);
+        const onWater = isOnWater(point);
+        console.log('Water check - onWater:', onWater, 'point:', point);
         
-        if (isOnWater(point)) {
+        if (onWater) {
           // Valid drop on water - update waypoint
+          console.log('Valid drop - updating waypoint position');
           onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
-          console.log('Waypoint dropped on water - position updated');
         } else {
           // Invalid drop on land - revert to original position
+          console.log('Invalid drop on land - reverting position');
           if (originalPosition) {
+            console.log('Reverting to original position:', originalPosition);
             marker.setLngLat(originalPosition);
             toast({
               title: "Invalid placement",
               description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
               variant: "destructive",
             });
-            console.log('Waypoint dropped on land - reverted to original position');
           }
         }
         
         // Always clean up drag state after dragend
+        console.log('Cleaning up drag state for waypoint:', waypoint.id);
         dragStartPositions.current.delete(waypoint.id);
+        console.log('Final dragPositions size:', dragStartPositions.current.size);
       });
 
       // Add popup with waypoint info
