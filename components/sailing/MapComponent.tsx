@@ -526,6 +526,8 @@ export function MapComponent({
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
           pointer-events: auto !important;
         }
         .mapboxgl-canvas {
