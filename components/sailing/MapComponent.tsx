@@ -256,10 +256,51 @@ export function MapComponent({
       console.log('Style loaded - initializing map features');
       styleLoaded.current = true;
       
-      // Add click handler
+      // Check if point is on water
+      const isOnWater = (point: mapboxgl.Point) => {
+        const features = map.current?.queryRenderedFeatures(point);
+        if (!features) return true;
+        
+        // Check for land-related features
+        const landFeatures = features.filter(feature => {
+          const sourceLayer = feature.sourceLayer;
+          return sourceLayer && (
+            sourceLayer.includes('landuse') ||
+            sourceLayer.includes('building') ||
+            sourceLayer.includes('road') ||
+            sourceLayer.includes('landcover') ||
+            sourceLayer === 'land'
+          );
+        });
+        
+        return landFeatures.length === 0;
+      };
+      
+      // Add mousemove handler for cursor changes
+      map.current?.on("mousemove", (e) => {
+        const canvas = map.current?.getCanvas();
+        if (!canvas) return;
+        
+        // Check if hovering over a marker
+        const markerElements = document.elementsFromPoint(e.point.x, e.point.y);
+        const hoveringMarker = markerElements.some(el => el.classList.contains('waypoint-marker'));
+        
+        if (hoveringMarker) {
+          canvas.style.cursor = 'pointer';
+        } else if (isOnWater(e.point)) {
+          canvas.style.cursor = 'crosshair';
+        } else {
+          canvas.style.cursor = 'not-allowed';
+        }
+      });
+      
+      // Add click handler with water detection
       map.current?.on("click", (e) => {
         console.log('Map clicked at:', e.lngLat.lng, e.lngLat.lat);
-        onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
+        
+        if (isOnWater(e.point)) {
+          onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
+        }
       });
       
       // If we have waypoints, update them now
