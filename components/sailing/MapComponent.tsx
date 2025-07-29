@@ -30,7 +30,13 @@ export function MapComponent({
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
   const dragStartPositions = useRef<Map<number, mapboxgl.LngLat>>(new Map());
   const recentlyDragged = useRef<Set<number>>(new Set());
+  const currentWaypoints = useRef<Waypoint[]>(waypoints);
   const { toast } = useToast();
+
+  // Keep waypoints ref updated
+  useEffect(() => {
+    currentWaypoints.current = waypoints;
+  }, [waypoints]);
 
   useEffect(() => {
     // Set Mapbox token directly
@@ -285,11 +291,17 @@ export function MapComponent({
             console.log('Map not available for fitBounds');
             return;
           }
-          
-          const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
-          const bounds = new mapboxgl.LngLatBounds();
-          coordinates.forEach(coord => bounds.extend(coord));
-          console.log('Fitting bounds for coordinates:', coordinates);
+           // Get fresh waypoints from the ref, not the closure
+           const freshWaypoints = currentWaypoints.current;
+           if (freshWaypoints.length < 2) {
+             console.log('Not enough waypoints for fitBounds:', freshWaypoints.length);
+             return;
+           }
+           
+           const coordinates = freshWaypoints.map(w => [w.lng, w.lat] as [number, number]);
+           const bounds = new mapboxgl.LngLatBounds();
+           coordinates.forEach(coord => bounds.extend(coord));
+           console.log('Fitting bounds for fresh coordinates:', coordinates);
           
           map.current.fitBounds(bounds, {
             padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
@@ -398,36 +410,40 @@ export function MapComponent({
       
       // Reset inactivity timer on user interaction with enhanced framing
       const resetTimer = () => {
-        console.log('resetTimer called from map interaction - waypoints:', waypoints.length);
+        console.log('resetTimer called from map interaction');
         if (inactivityTimer.current) {
           clearTimeout(inactivityTimer.current);
           console.log('Cleared existing timer from map interaction');
         }
         
-        if (waypoints.length > 1) {
-          console.log('Setting new timer from map interaction');
-          inactivityTimer.current = setTimeout(() => {
-            console.log('Map interaction timer triggered - executing fitBounds');
-            if (!map.current) {
-              console.log('Map not available for fitBounds from interaction');
-              return;
-            }
-            
-            const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
-            const bounds = new mapboxgl.LngLatBounds();
-            coordinates.forEach(coord => bounds.extend(coord));
-            console.log('Fitting bounds from interaction for coordinates:', coordinates);
-            
-            map.current.fitBounds(bounds, {
-              padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
-              maxZoom: 8, // Prevent zooming too close for short routes
-              duration: 2500, // Slightly longer animation for smoother feel
-              easing: (t) => t * (2 - t) // gentle ease-out function
-            });
-          }, 1000);
-        } else {
-          console.log('Not setting timer from interaction - need more than 1 waypoint');
-        }
+        // Always restart the timer, it will check waypoints when it fires
+        console.log('Setting new timer from map interaction');
+        inactivityTimer.current = setTimeout(() => {
+          console.log('Map interaction timer triggered - executing fitBounds');
+          if (!map.current) {
+            console.log('Map not available for fitBounds from interaction');
+            return;
+          }
+           
+           // Get fresh waypoints from the ref, not the closure
+           const freshWaypoints = currentWaypoints.current;
+           if (freshWaypoints.length < 2) {
+             console.log('Not enough waypoints for fitBounds from interaction:', freshWaypoints.length);
+             return;
+           }
+           
+           const coordinates = freshWaypoints.map(w => [w.lng, w.lat] as [number, number]);
+           const bounds = new mapboxgl.LngLatBounds();
+           coordinates.forEach(coord => bounds.extend(coord));
+           console.log('Fitting bounds from interaction for fresh coordinates:', coordinates);
+          
+          map.current.fitBounds(bounds, {
+            padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
+            maxZoom: 8, // Prevent zooming too close for short routes
+            duration: 2500, // Slightly longer animation for smoother feel
+            easing: (t) => t * (2 - t) // gentle ease-out function
+          });
+        }, 1000);
       };
       
       
