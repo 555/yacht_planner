@@ -1,0 +1,88 @@
+"use client";
+
+import { useState } from "react";
+import { MapComponent } from "./MapComponent";
+import { CalculatorControls } from "./CalculatorControls";
+import { RouteResults } from "./RouteResults";
+import { Waypoint, CalculationSettings, Marina } from "@/types/sailing";
+
+export function SailingCalculator() {
+  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
+  const [settings, setSettings] = useState<CalculationSettings>({
+    vesselSpeed: 6,
+    fuelConsumption: 3,
+    fuelPrice: 5.5,
+    units: "imperial"
+  });
+  const [marinas, setMarinas] = useState<Marina[]>([]);
+  const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
+
+  const addWaypoint = (lng: number, lat: number) => {
+    const newWaypoint: Waypoint = {
+      id: Date.now(),
+      lng,
+      lat,
+      name: `Waypoint ${waypoints.length + 1}`
+    };
+    setWaypoints([...waypoints, newWaypoint]);
+  };
+
+  const removeWaypoint = (id: number) => {
+    setWaypoints(waypoints.filter(w => w.id !== id));
+    const newSelected = { ...selectedWaypointMarinas };
+    delete newSelected[id];
+    setSelectedWaypointMarinas(newSelected);
+  };
+
+  const updateWaypoint = (id: number, lng: number, lat: number) => {
+    setWaypoints(waypoints.map(w => 
+      w.id === id ? { ...w, lng, lat } : w
+    ));
+  };
+
+  const clearRoute = () => {
+    setWaypoints([]);
+    setSelectedWaypointMarinas({});
+  };
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold text-foreground">
+          Sailing Distance Calculator
+        </h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          Plan your sailing route, calculate distances, and find nearby marinas. 
+          Click on the map to add waypoints and create your sailing route.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <MapComponent
+            waypoints={waypoints}
+            onAddWaypoint={addWaypoint}
+            onUpdateWaypoint={updateWaypoint}
+            marinas={marinas}
+            selectedWaypointMarinas={selectedWaypointMarinas}
+          />
+        </div>
+        
+        <div className="space-y-6">
+          <CalculatorControls
+            settings={settings}
+            onSettingsChange={setSettings}
+            onClearRoute={clearRoute}
+          />
+          
+          <RouteResults
+            waypoints={waypoints}
+            settings={settings}
+            onRemoveWaypoint={removeWaypoint}
+            selectedWaypointMarinas={selectedWaypointMarinas}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
