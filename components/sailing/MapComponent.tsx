@@ -21,7 +21,7 @@ export function MapComponent({
 }: MapComponentProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const markers = useRef<mapboxgl.Marker[]>([]);
+  const markers = useRef<Map<number, mapboxgl.Marker>>(new Map());
   const [mapboxToken, setMapboxToken] = useState<string>("");
   const styleLoaded = useRef<boolean>(false);
 
@@ -31,86 +31,98 @@ export function MapComponent({
     setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
   }, []);
 
+  // Function to create a marker for a waypoint
+  const createMarker = (waypoint: Waypoint, index: number) => {
+    const el = document.createElement("div");
+    el.className = "waypoint-marker";
+    el.style.cssText = `
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #3b82f6;
+      border: 3px solid white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      z-index: 1000;
+      position: absolute;
+    `;
+    el.textContent = (index + 1).toString();
+
+    const marker = new mapboxgl.Marker({
+      element: el,
+      draggable: true
+    })
+      .setLngLat([waypoint.lng, waypoint.lat])
+      .addTo(map.current!);
+
+    marker.on("dragend", () => {
+      const lngLat = marker.getLngLat();
+      onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
+    });
+
+    // Add popup with waypoint info
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`
+        <div>
+          <h3 class="font-semibold">${waypoint.name}</h3>
+          <p class="text-sm text-muted-foreground">
+            ${waypoint.lat.toFixed(6)}, ${waypoint.lng.toFixed(6)}
+          </p>
+        </div>
+      `);
+
+    marker.setPopup(popup);
+    return marker;
+  };
+
   // Function to update waypoints and routes
   const updateWaypoints = () => {
-    console.log('updateWaypoints called - map:', !!map.current, 'styleLoaded:', styleLoaded.current, 'waypoints:', waypoints.length);
     if (!map.current || !styleLoaded.current) {
-      console.log('Cannot update waypoints - style not ready');
       return;
     }
 
-    console.log('Updating waypoints:', waypoints.length, 'waypoints data:', waypoints);
-    console.log('About to start forEach, waypoints array:', JSON.stringify(waypoints));
+    // Get current marker IDs
+    const currentMarkerIds = new Set(markers.current.keys());
+    const waypointIds = new Set(waypoints.map(w => w.id));
 
-    // Clear existing markers
-    markers.current.forEach(marker => marker.remove());
-    markers.current = [];
-
-    // Add waypoint markers
-    console.log('Starting forEach loop with', waypoints.length, 'waypoints');
-    waypoints.forEach((waypoint, index) => {
-      console.log('Creating marker for waypoint:', waypoint.id, 'at', waypoint.lat, waypoint.lng);
-      
-      const el = document.createElement("div");
-      el.className = "waypoint-marker";
-      el.style.cssText = `
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #3b82f6;
-        border: 3px solid white;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 14px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        z-index: 1000;
-        position: absolute;
-      `;
-      el.textContent = (index + 1).toString();
-      
-      console.log('Element created:', el, 'with text:', el.textContent);
-
-      const marker = new mapboxgl.Marker({
-        element: el,
-        draggable: true
-      })
-        .setLngLat([waypoint.lng, waypoint.lat])
-        .addTo(map.current!);
-
-      console.log('Marker created and added to map:', marker);
-
-      marker.on("dragend", () => {
-        const lngLat = marker.getLngLat();
-        onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
-      });
-
-      // Add popup with waypoint info
-      const popup = new mapboxgl.Popup({ offset: 25 })
-        .setHTML(`
-          <div>
-            <h3 class="font-semibold">${waypoint.name}</h3>
-            <p class="text-sm text-muted-foreground">
-              ${waypoint.lat.toFixed(6)}, ${waypoint.lng.toFixed(6)}
-            </p>
-          </div>
-        `);
-
-      marker.setPopup(popup);
-      markers.current.push(marker);
-      console.log('Marker added to markers array. Total markers:', markers.current.length);
+    // Remove markers for waypoints that no longer exist
+    currentMarkerIds.forEach(id => {
+      if (!waypointIds.has(id)) {
+        const marker = markers.current.get(id);
+        if (marker) {
+          marker.remove();
+          markers.current.delete(id);
+        }
+      }
     });
 
-    // Draw route line
+    // Add or update markers for current waypoints
+    waypoints.forEach((waypoint, index) => {
+      const existingMarker = markers.current.get(waypoint.id);
+      
+      if (existingMarker) {
+        // Update existing marker position and number
+        existingMarker.setLngLat([waypoint.lng, waypoint.lat]);
+        const el = existingMarker.getElement();
+        el.textContent = (index + 1).toString();
+      } else {
+        // Create new marker
+        const marker = createMarker(waypoint, index);
+        markers.current.set(waypoint.id, marker);
+      }
+    });
+
+    // Update route line
     if (waypoints.length > 1) {
-      console.log('Drawing route with', waypoints.length, 'waypoints');
       const coordinates = waypoints.map(w => [w.lng, w.lat]);
       
       if (map.current.getSource("route")) {
-        console.log('Updating existing route source');
         (map.current.getSource("route") as mapboxgl.GeoJSONSource).setData({
           type: "Feature",
           properties: {},
@@ -120,7 +132,6 @@ export function MapComponent({
           }
         });
       } else {
-        console.log('Creating new route source');
         map.current.addSource("route", {
           type: "geojson",
           data: {
