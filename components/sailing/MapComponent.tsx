@@ -68,7 +68,7 @@ export function MapComponent({
         font-size: 14px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         z-index: 1000;
-        position: relative;
+        position: absolute;
       `;
       el.textContent = (index + 1).toString();
       
