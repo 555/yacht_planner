@@ -261,15 +261,28 @@ export function MapComponent({
         const features = map.current?.queryRenderedFeatures(point);
         if (!features) return true;
         
-        // Check for land-related features
+        // Debug: log what features are available
+        if (features.length > 0) {
+          console.log('Features at point:', features.map(f => ({
+            sourceLayer: f.sourceLayer,
+            source: f.source,
+            layer: f.layer,
+            properties: f.properties
+          })));
+        }
+        
+        // Check for land-related features - adjust based on your style
         const landFeatures = features.filter(feature => {
           const sourceLayer = feature.sourceLayer;
+          const layerId = feature.layer?.id;
           return sourceLayer && (
             sourceLayer.includes('landuse') ||
             sourceLayer.includes('building') ||
             sourceLayer.includes('road') ||
             sourceLayer.includes('landcover') ||
-            sourceLayer === 'land'
+            sourceLayer === 'land' ||
+            layerId?.includes('land') ||
+            layerId?.includes('building')
           );
         });
         
