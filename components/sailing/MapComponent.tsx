@@ -174,46 +174,17 @@ export function MapComponent({
     console.log('Map created, adding controls');
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Function to sync canvas dimensions with container
-    const syncContainerDimensions = () => {
-      if (!map.current || !mapContainer.current) return;
-      
-      // Completely remove all inline styles first
-      mapContainer.current.removeAttribute('style');
-      
-      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
-      if (canvas) {
-        canvas.removeAttribute('style');
+    // Simple resize handler - just call map.resize()
+    const handleResize = () => {
+      if (map.current) {
+        map.current.resize();
       }
-      
-      // Force a reflow to ensure styles are completely cleared
-      mapContainer.current.offsetHeight;
-      
-      // Now measure the container dimensions
-      const containerRect = mapContainer.current.getBoundingClientRect();
-      const widthPx = `${containerRect.width}px`;
-      const heightPx = `${containerRect.height}px`;
-      
-      // Set new inline dimensions
-      mapContainer.current.style.width = widthPx;
-      mapContainer.current.style.height = heightPx;
-      
-      if (canvas) {
-        canvas.style.width = widthPx;
-        canvas.style.height = heightPx;
-      }
-      
-      // Trigger map resize
-      map.current.resize();
     };
 
     // Everything map-related happens ONLY after style loads
     map.current.on('style.load', () => {
       console.log('Style loaded - initializing map features');
       styleLoaded.current = true;
-      
-      // Sync dimensions after style loads
-      setTimeout(syncContainerDimensions, 100);
       
       // Add click handler
       map.current?.on("click", (e) => {
@@ -228,21 +199,13 @@ export function MapComponent({
       }
     });
 
-    // Sync dimensions on resize
-    map.current.on('resize', syncContainerDimensions);
-    
-    // Create ResizeObserver to watch the document element for viewport changes
-    const resizeObserver = new ResizeObserver(() => {
-      syncContainerDimensions();
-    });
-    
-    // Start observing the document element (html)
-    resizeObserver.observe(document.documentElement);
+    // Add window resize listener
+    window.addEventListener('resize', handleResize);
 
     return () => {
       console.log('Cleaning up map');
       styleLoaded.current = false;
-      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleResize);
       map.current?.remove();
     };
   }, [mapboxToken, onAddWaypoint]);
