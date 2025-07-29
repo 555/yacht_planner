@@ -167,7 +167,7 @@ export function MapComponent({
           paint: {
             "line-color": "#2a1063",
             "line-width": 3,
-            "line-dasharray": [5, 5]
+            "line-dasharray": [0.5, 2]
           }
         }, "waterway-label");
       }
