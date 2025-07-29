@@ -36,7 +36,7 @@ export function MapComponent({
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/satellite-streets-v12",
+      style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
       center: [-74.5, 40],
       zoom: 9,
       projection: { name: "mercator" }
