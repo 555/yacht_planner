@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import { Waypoint, Marina } from "@/types/sailing";
+import { useToast } from "@/hooks/use-toast";
 
 interface MapComponentProps {
   waypoints: Waypoint[];
@@ -27,11 +28,27 @@ export function MapComponent({
   const [mapboxToken, setMapboxToken] = useState<string>("");
   const styleLoaded = useRef<boolean>(false);
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
+  const dragStartPositions = useRef<Map<number, mapboxgl.LngLat>>(new Map());
+  const { toast } = useToast();
 
   useEffect(() => {
     // Set Mapbox token directly
     console.log('Setting Mapbox token');
     setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
+  }, []);
+
+  // Check if point is on water - shared function
+  const isOnWater = useCallback((point: mapboxgl.Point) => {
+    const features = map.current?.queryRenderedFeatures(point);
+    if (!features) return false;
+    
+    // Check for water features - look specifically for water source layer
+    const waterFeatures = features.filter(feature => {
+      const sourceLayer = feature.sourceLayer;
+      return sourceLayer === 'water';
+    });
+    
+    return waterFeatures.length > 0;
   }, []);
 
   // Memoize the updateWaypoints function to prevent unnecessary re-renders
@@ -104,9 +121,61 @@ export function MapComponent({
 
       console.log('Marker created and added to map:', marker);
 
+      // Store original position on drag start
+      marker.on("dragstart", () => {
+        const lngLat = marker.getLngLat();
+        dragStartPositions.current.set(waypoint.id, lngLat);
+        // Add visual feedback during drag
+        el.style.transform = 'scale(1.1)';
+        el.style.zIndex = '2000';
+        console.log('Drag started for waypoint', waypoint.id, 'at', lngLat);
+      });
+
+      // Add drag event for real-time visual feedback
+      marker.on("drag", () => {
+        const lngLat = marker.getLngLat();
+        const point = map.current!.project(lngLat);
+        
+        if (isOnWater(point)) {
+          el.style.background = '#059669'; // Green for valid
+          el.style.borderColor = '#d1fae5';
+        } else {
+          el.style.background = '#dc2626'; // Red for invalid
+          el.style.borderColor = '#fee2e2';
+        }
+      });
+
       marker.on("dragend", () => {
         const lngLat = marker.getLngLat();
-        onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
+        const originalPosition = dragStartPositions.current.get(waypoint.id);
+        
+        // Reset visual feedback
+        el.style.transform = 'scale(1)';
+        el.style.zIndex = '1000';
+        el.style.background = '#2a1063';
+        el.style.borderColor = 'white';
+        
+        // Convert to screen coordinates for water detection
+        const point = map.current!.project(lngLat);
+        
+        if (isOnWater(point)) {
+          // Valid drop on water - update waypoint
+          onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
+          dragStartPositions.current.delete(waypoint.id);
+          console.log('Waypoint dropped on water - position updated');
+        } else {
+          // Invalid drop on land - revert to original position
+          if (originalPosition) {
+            marker.setLngLat(originalPosition);
+            dragStartPositions.current.delete(waypoint.id);
+            toast({
+              title: "Invalid placement",
+              description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
+              variant: "destructive",
+            });
+            console.log('Waypoint dropped on land - reverted to original position');
+          }
+        }
       });
 
       // Add popup with waypoint info
@@ -201,7 +270,7 @@ export function MapComponent({
     };
     
     resetInactivityTimer();
-  }, [waypoints, onUpdateWaypoint, onRemoveWaypoint]);
+  }, [waypoints, onUpdateWaypoint, onRemoveWaypoint, isOnWater, toast]);
 
   useEffect(() => {
     console.log('Map effect triggered - container:', !!mapContainer.current, 'token:', !!mapboxToken);
@@ -315,29 +384,6 @@ export function MapComponent({
         }
       };
       
-      // Check if point is on water
-      const isOnWater = (point: mapboxgl.Point) => {
-        const features = map.current?.queryRenderedFeatures(point);
-        if (!features) return false;
-        
-        // Debug: log what features are available
-        if (features.length > 0) {
-          console.log('Features at point:', features.map(f => ({
-            sourceLayer: f.sourceLayer,
-            source: f.source,
-            layer: f.layer,
-            properties: f.properties
-          })));
-        }
-        
-        // Check for water features - look specifically for water source layer
-        const waterFeatures = features.filter(feature => {
-          const sourceLayer = feature.sourceLayer;
-          return sourceLayer === 'water';
-        });
-        
-        return waterFeatures.length > 0;
-      };
       
       // Add mousemove handler for cursor changes and reset timer
       map.current?.on("mousemove", (e) => {
@@ -350,12 +396,15 @@ export function MapComponent({
         const markerElements = document.elementsFromPoint(e.point.x, e.point.y);
         const hoveringMarker = markerElements.some(el => el.classList.contains('waypoint-marker'));
         
+        // Check if we're currently dragging a marker
+        const isDragging = Array.from(dragStartPositions.current.keys()).length > 0;
+        
         if (hoveringMarker) {
           canvas.style.cursor = 'pointer';
         } else if (isOnWater(e.point)) {
-          canvas.style.cursor = 'crosshair';
+          canvas.style.cursor = isDragging ? 'grabbing' : 'crosshair';
         } else {
-          canvas.style.cursor = 'not-allowed';
+          canvas.style.cursor = isDragging ? 'not-allowed' : 'not-allowed';
         }
       });
       
