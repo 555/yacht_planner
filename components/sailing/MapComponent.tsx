@@ -182,14 +182,14 @@ export function MapComponent({
       const mapElement = mapContainer.current.querySelector('.mapboxgl-map') as HTMLElement;
       
       if (canvas && container && mapElement) {
-        const canvasStyle = window.getComputedStyle(canvas);
-        const width = canvasStyle.width;
-        const height = canvasStyle.height;
+        const canvasRect = canvas.getBoundingClientRect();
+        const widthPx = `${canvasRect.width}px`;
+        const heightPx = `${canvasRect.height}px`;
         
-        container.style.width = width;
-        container.style.height = height;
-        mapElement.style.width = width;
-        mapElement.style.height = height;
+        container.style.width = widthPx;
+        container.style.height = heightPx;
+        mapElement.style.width = widthPx;
+        mapElement.style.height = heightPx;
       }
     };
 
