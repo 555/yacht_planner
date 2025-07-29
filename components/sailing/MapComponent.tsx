@@ -110,16 +110,16 @@ export function MapComponent({
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: hsl(var(--primary));
-        border: 3px solid hsl(var(--background));
+        background: #221896;
+        border: 3px solid #f4f4f4;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: hsl(var(--primary-foreground));
+        color: #f4f4f4;
         font-weight: bold;
         font-size: 14px;
-        box-shadow: 0 4px 8px hsl(var(--primary) / 0.4);
+        box-shadow: 0 4px 8px rgba(34, 24, 150, 0.4);
         z-index: 1000;
         position: absolute;
         transition: all 0.2s ease;
@@ -128,13 +128,13 @@ export function MapComponent({
       
       // Enhanced hover and focus effects (avoid transform to prevent positioning issues)
       const applyHoverState = () => {
-        el.style.background = 'hsl(var(--destructive))';
-        el.style.boxShadow = '0 6px 12px hsl(var(--destructive) / 0.4)';
+        el.style.background = '#e4d90f';
+        el.style.boxShadow = '0 6px 12px rgba(228, 217, 15, 0.4)';
       };
       
       const applyNormalState = () => {
-        el.style.background = 'hsl(var(--primary))';
-        el.style.boxShadow = '0 4px 8px hsl(var(--primary) / 0.4)';
+        el.style.background = '#221896';
+        el.style.boxShadow = '0 4px 8px rgba(34, 24, 150, 0.4)';
       };
       
       el.addEventListener('mouseenter', applyHoverState);
@@ -183,7 +183,7 @@ export function MapComponent({
       marker.on("dragstart", () => {
         const lngLat = marker.getLngLat();
         dragStartPositions.current.set(waypoint.id, lngLat);
-        el.style.boxShadow = '0 8px 16px hsl(var(--primary) / 0.6)';
+        el.style.boxShadow = '0 8px 16px rgba(34, 24, 150, 0.6)';
         el.style.zIndex = '2000';
         el.setAttribute('aria-label', `Dragging waypoint ${index + 1}. Drop on water to move, or on land to cancel.`);
       });
@@ -194,11 +194,11 @@ export function MapComponent({
         const point = map.current!.project(lngLat);
         
         if (isOnWater(point)) {
-          el.style.background = 'hsl(var(--success))';
-          el.style.borderColor = 'hsl(var(--success-foreground))';
+          el.style.background = '#3be856';
+          el.style.borderColor = '#f4f4f4';
         } else {
-          el.style.background = 'hsl(var(--destructive))';
-          el.style.borderColor = 'hsl(var(--destructive-foreground))';
+          el.style.background = '#e4d90f';
+          el.style.borderColor = '#040f0b';
         }
       });
 
@@ -207,10 +207,10 @@ export function MapComponent({
         const originalPosition = dragStartPositions.current.get(waypoint.id);
         
         // Reset visual state
-        el.style.boxShadow = '0 4px 8px hsl(var(--primary) / 0.4)';
+        el.style.boxShadow = '0 4px 8px rgba(34, 24, 150, 0.4)';
         el.style.zIndex = '1000';
-        el.style.background = 'hsl(var(--primary))';
-        el.style.borderColor = 'hsl(var(--background))';
+        el.style.background = '#221896';
+        el.style.borderColor = '#f4f4f4';
         el.setAttribute('aria-label', `Waypoint ${index + 1} at ${waypoint.lat.toFixed(4)}, ${waypoint.lng.toFixed(4)}. Press Enter to remove or drag to move.`);
         
         const point = map.current!.project(lngLat);
@@ -545,7 +545,7 @@ export function MapComponent({
           pointer-events: auto !important;
         }
         .waypoint-marker:focus {
-          outline: 2px solid hsl(var(--primary));
+          outline: 2px solid #221896;
           outline-offset: 2px;
         }
         .waypoint-popup {
