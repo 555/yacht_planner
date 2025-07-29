@@ -61,7 +61,7 @@ export function MapComponent({
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #3b82f6;
+        background: #2a1063;
         border: 3px solid white;
         cursor: pointer;
         display: flex;
@@ -73,7 +73,17 @@ export function MapComponent({
         box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         z-index: 1000;
         position: absolute;
+        transition: background-color 0.2s ease;
       `;
+      
+      // Add hover effect
+      el.addEventListener('mouseenter', () => {
+        el.style.background = '#d03434';
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        el.style.background = '#2a1063';
+      });
       el.textContent = (index + 1).toString();
       
       console.log('Element created:', el, 'with text:', el.textContent);
@@ -155,7 +165,7 @@ export function MapComponent({
             "line-cap": "round"
           },
           paint: {
-            "line-color": "#3b82f6",
+            "line-color": "#2a1063",
             "line-width": 3,
             "line-dasharray": [5, 5]
           }
