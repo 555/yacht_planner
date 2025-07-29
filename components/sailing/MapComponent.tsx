@@ -226,11 +226,11 @@ export function MapComponent({
           position: 'relative'
         }}
       />
-      <style jsx>{`
+      <style>{`
         .mapboxgl-canvas-container {
           position: relative !important;
           width: 100% !important;
-          height: 100% !important;
+          height: 600px !important;
         }
         .mapboxgl-canvas {
           position: absolute !important;
