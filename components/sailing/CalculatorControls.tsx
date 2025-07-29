@@ -21,9 +21,9 @@ export function CalculatorControls({
   };
 
   const toggleUnits = () => {
-    const newUnits = settings.units === "imperial" ? "metric" : "imperial";
+    const newUnits: "imperial" | "metric" = settings.units === "imperial" ? "metric" : "imperial";
     
-    let newSettings = { ...settings, units: newUnits };
+    let newSettings: CalculationSettings = { ...settings, units: newUnits };
     
     if (newUnits === "metric") {
       // Converting from imperial to metric
