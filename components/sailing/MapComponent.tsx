@@ -47,6 +47,8 @@ export function MapComponent({
 
     // Add waypoint markers
     waypoints.forEach((waypoint, index) => {
+      console.log('Creating marker for waypoint:', waypoint.id, 'at', waypoint.lat, waypoint.lng);
+      
       const el = document.createElement("div");
       el.className = "waypoint-marker";
       el.style.cssText = `
@@ -67,6 +69,8 @@ export function MapComponent({
         position: relative;
       `;
       el.textContent = (index + 1).toString();
+      
+      console.log('Element created:', el, 'with text:', el.textContent);
 
       const marker = new mapboxgl.Marker({
         element: el,
@@ -74,6 +78,8 @@ export function MapComponent({
       })
         .setLngLat([waypoint.lng, waypoint.lat])
         .addTo(map.current!);
+
+      console.log('Marker created and added to map:', marker);
 
       marker.on("dragend", () => {
         const lngLat = marker.getLngLat();
@@ -93,6 +99,7 @@ export function MapComponent({
 
       marker.setPopup(popup);
       markers.current.push(marker);
+      console.log('Marker added to markers array. Total markers:', markers.current.length);
     });
 
     // Draw route line
