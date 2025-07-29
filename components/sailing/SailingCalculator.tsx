@@ -10,7 +10,7 @@ export function SailingCalculator() {
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [settings, setSettings] = useState<CalculationSettings>({
     vesselSpeed: 6,
-    fuelConsumption: 3,
+    fuelConsumption: 100,
     fuelPrice: 5.5,
     units: "imperial"
   });
