@@ -54,10 +54,10 @@ export function MapComponent({
       const el = document.createElement("div");
       el.className = "waypoint-marker";
       el.style.cssText = `
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: hsl(var(--primary));
+        background: #3b82f6;
         border: 3px solid white;
         cursor: pointer;
         display: flex;
@@ -65,8 +65,8 @@ export function MapComponent({
         justify-content: center;
         color: white;
         font-weight: bold;
-        font-size: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-size: 14px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         z-index: 1000;
         position: relative;
       `;
