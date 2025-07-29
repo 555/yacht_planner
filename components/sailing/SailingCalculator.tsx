@@ -12,7 +12,7 @@ export function SailingCalculator() {
   const SETTINGS_KEY = 'sailing_calculator_settings';
 
   // Helper functions for localStorage
-  const loadFromStorage = <T>(key: string, defaultValue: T): T => {
+  const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
     if (typeof window === 'undefined') return defaultValue;
     try {
       const stored = localStorage.getItem(key);
@@ -23,7 +23,7 @@ export function SailingCalculator() {
     }
   };
 
-  const saveToStorage = <T>(key: string, value: T): void => {
+  const saveToStorage = <T,>(key: string, value: T): void => {
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem(key, JSON.stringify(value));
