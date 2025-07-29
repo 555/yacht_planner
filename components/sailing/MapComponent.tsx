@@ -367,16 +367,22 @@ export function MapComponent({
         .mapboxgl-map {
           width: 100% !important;
           height: 100% !important;
+          pointer-events: auto !important;
         }
         .mapboxgl-canvas-container {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
+          pointer-events: auto !important;
         }
         .mapboxgl-canvas {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
+          pointer-events: auto !important;
+        }
+        .waypoint-marker {
+          pointer-events: auto !important;
         }
       `}</style>
       {waypoints.length === 0 && (
