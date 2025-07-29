@@ -45,35 +45,33 @@ export function MapComponent({
 
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Wait for style to load before allowing interactions
+    // Wait for style to load completely before setting flag
     map.current.on('style.load', () => {
-      console.log('Mapbox style loaded');
+      console.log('Style loaded event fired');
       setIsStyleLoaded(true);
     });
 
-    // Also check if style is already loaded (in case event already fired)
-    if (map.current.isStyleLoaded()) {
-      console.log('Mapbox style already loaded');
-      setIsStyleLoaded(true);
-    }
-
-    // Add click handler for adding waypoints
-    map.current.on("click", (e) => {
-      onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
+    // Add click handler for adding waypoints only after style loads
+    map.current.on('style.load', () => {
+      map.current?.on("click", (e) => {
+        onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
+      });
     });
 
     return () => {
+      setIsStyleLoaded(false);
       map.current?.remove();
     };
   }, [mapboxToken, onAddWaypoint]);
 
-  // Update waypoint markers
+  // Update waypoint markers and routes - only when style is ready
   useEffect(() => {
-    console.log('Waypoint effect running:', { mapExists: !!map.current, isStyleLoaded, waypointCount: waypoints.length });
     if (!map.current || !isStyleLoaded) {
-      console.log('Skipping waypoint effect - map not ready');
+      console.log('Skipping waypoint update - style not ready');
       return;
     }
+
+    console.log('Processing waypoints:', waypoints.length);
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
