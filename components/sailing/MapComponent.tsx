@@ -40,12 +40,14 @@ export function MapComponent({
     }
 
     console.log('Updating waypoints:', waypoints.length, 'waypoints data:', waypoints);
+    console.log('About to start forEach, waypoints array:', JSON.stringify(waypoints));
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
     // Add waypoint markers
+    console.log('Starting forEach loop with', waypoints.length, 'waypoints');
     waypoints.forEach((waypoint, index) => {
       console.log('Creating marker for waypoint:', waypoint.id, 'at', waypoint.lat, waypoint.lng);
       
