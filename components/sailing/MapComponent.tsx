@@ -168,7 +168,10 @@ export function MapComponent({
       style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
       center: [-74.5, 40],
       zoom: 2,
-      projection: { name: "mercator" }
+      maxZoom: 9.6,
+      projection: { name: "mercator" },
+      dragRotate: false,
+      touchZoomRotate: false
     });
 
     console.log('Map created, adding controls');
