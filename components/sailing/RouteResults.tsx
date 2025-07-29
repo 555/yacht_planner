@@ -11,6 +11,7 @@ interface RouteResultsProps {
   waypoints: Waypoint[];
   settings: CalculationSettings;
   onRemoveWaypoint: (id: number) => void;
+  onClearRoute: () => void;
   selectedWaypointMarinas: Record<number, Marina[]>;
 }
 
@@ -18,6 +19,7 @@ export function RouteResults({
   waypoints,
   settings,
   onRemoveWaypoint,
+  onClearRoute,
   selectedWaypointMarinas
 }: RouteResultsProps) {
   const route = calculateRoute(waypoints, settings);
@@ -106,8 +108,15 @@ export function RouteResults({
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Waypoints</CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onClearRoute}
+          >
+            Clear Route
+          </Button>
         </CardHeader>
         <CardContent className="space-y-3">
           {waypoints.map((waypoint, index) => (

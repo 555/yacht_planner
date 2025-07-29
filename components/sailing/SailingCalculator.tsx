@@ -87,13 +87,13 @@ export function SailingCalculator() {
           <CalculatorControls
             settings={settings}
             onSettingsChange={setSettings}
-            onClearRoute={clearRoute}
           />
           
           <RouteResults
             waypoints={waypoints}
             settings={settings}
             onRemoveWaypoint={removeWaypoint}
+            onClearRoute={clearRoute}
             selectedWaypointMarinas={selectedWaypointMarinas}
           />
         </div>

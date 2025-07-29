@@ -10,13 +10,11 @@ import { CalculationSettings } from "@/types/sailing";
 interface CalculatorControlsProps {
   settings: CalculationSettings;
   onSettingsChange: (settings: CalculationSettings) => void;
-  onClearRoute: () => void;
 }
 
 export function CalculatorControls({
   settings,
-  onSettingsChange,
-  onClearRoute
+  onSettingsChange
 }: CalculatorControlsProps) {
   const updateSetting = (key: keyof CalculationSettings, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
@@ -100,14 +98,6 @@ export function CalculatorControls({
             onChange={(e) => updateSetting("fuelPrice", Number(e.target.value))}
           />
         </div>
-
-        <Button 
-          variant="outline" 
-          onClick={onClearRoute}
-          className="w-full"
-        >
-          Clear Route
-        </Button>
       </CardContent>
     </Card>
   );
