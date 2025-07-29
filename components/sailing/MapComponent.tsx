@@ -246,7 +246,7 @@ export function MapComponent({
             // Redraw the line after marker position settles
             setTimeout(() => {
               updateRouteLineDisplay();
-            }, 50);
+            }, 200);
             toast({
               title: "Invalid placement",
               description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
