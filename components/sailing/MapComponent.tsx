@@ -196,7 +196,7 @@ export function MapComponent({
           el.style.background = '#3be856';
           el.style.borderColor = '#f4f4f4';
         } else {
-          el.style.background = '#e4d90f';
+          el.style.background = '#dc2626';
           el.style.borderColor = '#040f0b';
         }
       });
@@ -296,7 +296,7 @@ export function MapComponent({
             paint: {
               "line-color": "#221896",
               "line-width": 4,
-              "line-dasharray": [2, 3],
+              "line-dasharray": [1, 2],
               "line-opacity": 0.9
             }
           });
