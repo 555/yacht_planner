@@ -166,10 +166,6 @@ export function MapComponent({
         console.log('Map clicked at:', e.lngLat.lng, e.lngLat.lat);
         onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
       });
-      
-      // Trigger waypoint update now that style is ready
-      console.log('Calling updateWaypoints from style.load with waypoints:', waypoints.length);
-      updateWaypoints();
     });
 
     return () => {
@@ -178,9 +174,12 @@ export function MapComponent({
     };
   }, [mapboxToken, onAddWaypoint]);
 
-  // Call updateWaypoints when waypoints change
+  // Call updateWaypoints when waypoints change OR when style loads
   useEffect(() => {
-    updateWaypoints();
+    console.log('Waypoints effect triggered - waypoints:', waypoints.length, 'styleLoaded:', styleLoaded.current);
+    if (styleLoaded.current && waypoints.length > 0) {
+      updateWaypoints();
+    }
   }, [waypoints, onUpdateWaypoint]);
 
   if (!mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") {
