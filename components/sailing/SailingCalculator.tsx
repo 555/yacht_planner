@@ -1,21 +1,61 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { MapComponent } from "./MapComponent";
 import { CalculatorControls } from "./CalculatorControls";
 import { RouteResults } from "./RouteResults";
 import { Waypoint, CalculationSettings, Marina } from "@/types/sailing";
 
 export function SailingCalculator() {
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
-  const [settings, setSettings] = useState<CalculationSettings>({
-    vesselSpeed: 6,
-    fuelConsumption: 100,
-    fuelPrice: 5.5,
-    units: "imperial"
-  });
+  // localStorage keys
+  const WAYPOINTS_KEY = 'sailing_calculator_waypoints';
+  const SETTINGS_KEY = 'sailing_calculator_settings';
+
+  // Helper functions for localStorage
+  const loadFromStorage = <T>(key: string, defaultValue: T): T => {
+    if (typeof window === 'undefined') return defaultValue;
+    try {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : defaultValue;
+    } catch (error) {
+      console.warn(`Failed to load ${key} from localStorage:`, error);
+      return defaultValue;
+    }
+  };
+
+  const saveToStorage = <T>(key: string, value: T): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.warn(`Failed to save ${key} to localStorage:`, error);
+    }
+  };
+
+  // Initialize state with localStorage values
+  const [waypoints, setWaypoints] = useState<Waypoint[]>(() => 
+    loadFromStorage(WAYPOINTS_KEY, [])
+  );
+  const [settings, setSettings] = useState<CalculationSettings>(() => 
+    loadFromStorage(SETTINGS_KEY, {
+      vesselSpeed: 6,
+      fuelConsumption: 100,
+      fuelPrice: 5.5,
+      units: "imperial"
+    })
+  );
   const [marinas, setMarinas] = useState<Marina[]>([]);
   const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
+
+  // Save waypoints to localStorage whenever they change
+  useEffect(() => {
+    saveToStorage(WAYPOINTS_KEY, waypoints);
+  }, [waypoints]);
+
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    saveToStorage(SETTINGS_KEY, settings);
+  }, [settings]);
 
   const addWaypoint = useCallback((lng: number, lat: number) => {
     setWaypoints(prev => {
