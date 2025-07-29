@@ -230,13 +230,13 @@ export function MapComponent({
     // Sync dimensions on resize
     map.current.on('resize', syncContainerDimensions);
     
-    // Create ResizeObserver to watch the map container
+    // Create ResizeObserver to watch the body for window size changes
     const resizeObserver = new ResizeObserver(() => {
       syncContainerDimensions();
     });
     
-    // Start observing the map container
-    resizeObserver.observe(mapContainer.current);
+    // Start observing the body element
+    resizeObserver.observe(document.body);
 
     return () => {
       console.log('Cleaning up map');
