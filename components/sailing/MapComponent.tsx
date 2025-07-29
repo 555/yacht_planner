@@ -536,11 +536,12 @@ export function MapComponent({
       
       <div
         ref={mapContainer}
-        className="w-full rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="w-full shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         style={{
           position: 'relative',
           overflow: 'hidden',
-          height: '100%'
+          height: '100%',
+          borderRadius: '1rem'
         }}
         tabIndex={0}
         role="img"
