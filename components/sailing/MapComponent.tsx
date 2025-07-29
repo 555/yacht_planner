@@ -106,10 +106,13 @@ export function MapComponent({
       
       console.log('Element created:', el, 'with text:', el.textContent);
 
-      // Add click handler to remove waypoint
+      // Add click handler to remove waypoint (disabled during drag)
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        onRemoveWaypoint(waypoint.id);
+        // Only allow removal if not currently dragging this marker
+        if (!dragStartPositions.current.has(waypoint.id)) {
+          onRemoveWaypoint(waypoint.id);
+        }
       });
 
       const marker = new mapboxgl.Marker({
@@ -161,13 +164,11 @@ export function MapComponent({
         if (isOnWater(point)) {
           // Valid drop on water - update waypoint
           onUpdateWaypoint(waypoint.id, lngLat.lng, lngLat.lat);
-          dragStartPositions.current.delete(waypoint.id);
           console.log('Waypoint dropped on water - position updated');
         } else {
           // Invalid drop on land - revert to original position
           if (originalPosition) {
             marker.setLngLat(originalPosition);
-            dragStartPositions.current.delete(waypoint.id);
             toast({
               title: "Invalid placement",
               description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
@@ -176,6 +177,9 @@ export function MapComponent({
             console.log('Waypoint dropped on land - reverted to original position');
           }
         }
+        
+        // Always clean up drag state after dragend
+        dragStartPositions.current.delete(waypoint.id);
       });
 
       // Add popup with waypoint info
