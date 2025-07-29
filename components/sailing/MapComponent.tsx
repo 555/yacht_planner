@@ -152,11 +152,18 @@ export function MapComponent({
       const applyHoverState = () => {
         el.style.background = '#dc2626';
         el.style.boxShadow = '0 6px 12px rgba(220, 38, 38, 0.4)';
+        el.style.backgroundImage = "url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='3,6 5,6 21,6'/%3E%3Cpath d='m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2'/%3E%3Cline x1='10' y1='11' x2='10' y2='17'/%3E%3Cline x1='14' y1='11' x2='14' y2='17'/%3E%3C/svg%3E\")";
+        el.style.backgroundSize = '16px 16px';
+        el.style.backgroundPosition = 'center';
+        el.style.backgroundRepeat = 'no-repeat';
+        el.textContent = '';
       };
       
       const applyNormalState = () => {
         el.style.background = '#221896';
         el.style.boxShadow = '0 4px 8px rgba(34, 24, 150, 0.4)';
+        el.style.backgroundImage = '';
+        el.textContent = (index + 1).toString();
       };
       
       el.addEventListener('mouseenter', applyHoverState);
