@@ -25,22 +25,8 @@ export function MapComponent({
   const [mapboxToken, setMapboxToken] = useState<string>("");
 
   useEffect(() => {
-    // Get Mapbox token from Supabase secrets
-    const getMapboxToken = async () => {
-      try {
-        const response = await fetch('/api/get-mapbox-token');
-        if (response.ok) {
-          const data = await response.json();
-          setMapboxToken(data.token);
-        } else {
-          console.error("Failed to get Mapbox token");
-        }
-      } catch (error) {
-        console.error("Error getting Mapbox token:", error);
-      }
-    };
-
-    getMapboxToken();
+    // Set Mapbox token directly
+    setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
   }, []);
 
   useEffect(() => {
@@ -53,7 +39,7 @@ export function MapComponent({
       style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: [-74.5, 40],
       zoom: 9,
-      projection: "mercator"
+      projection: { name: "mercator" }
     });
 
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
