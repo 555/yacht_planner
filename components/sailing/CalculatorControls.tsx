@@ -24,7 +24,22 @@ export function CalculatorControls({
 
   const toggleUnits = () => {
     const newUnits = settings.units === "imperial" ? "metric" : "imperial";
-    onSettingsChange({ ...settings, units: newUnits });
+    
+    let newSettings = { ...settings, units: newUnits };
+    
+    if (newUnits === "metric") {
+      // Converting from imperial to metric
+      newSettings.vesselSpeed = Math.round(settings.vesselSpeed * 1.85 * 10) / 10;
+      newSettings.fuelConsumption = Math.round(settings.fuelConsumption * 3.75 * 10) / 10;
+      newSettings.fuelPrice = Math.round((settings.fuelPrice / 3.75) * 100) / 100;
+    } else {
+      // Converting from metric to imperial
+      newSettings.vesselSpeed = Math.round((settings.vesselSpeed / 1.85) * 10) / 10;
+      newSettings.fuelConsumption = Math.round((settings.fuelConsumption / 3.75) * 10) / 10;
+      newSettings.fuelPrice = Math.round(settings.fuelPrice * 3.75 * 100) / 100;
+    }
+    
+    onSettingsChange(newSettings);
   };
 
   return (
