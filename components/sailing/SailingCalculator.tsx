@@ -58,7 +58,17 @@ export function SailingCalculator() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
+        <div 
+          className="lg:col-span-3 map-container" 
+          data-lov-id="components/sailing/SailingCalculator.tsx:61:8"
+          ref={(el) => {
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              el.style.width = `${rect.width}px`;
+              el.style.height = `${rect.height}px`;
+            }
+          }}
+        >
           <MapComponent
             waypoints={waypoints}
             onAddWaypoint={addWaypoint}
