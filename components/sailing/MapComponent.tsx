@@ -23,55 +23,21 @@ export function MapComponent({
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const [mapboxToken, setMapboxToken] = useState<string>("");
-  const [isStyleLoaded, setIsStyleLoaded] = useState<boolean>(false);
+  const styleLoaded = useRef<boolean>(false);
 
   useEffect(() => {
     // Set Mapbox token directly
     setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
   }, []);
 
-  useEffect(() => {
-    if (!mapContainer.current || !mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") return;
-
-    mapboxgl.accessToken = mapboxToken;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
-      center: [-74.5, 40],
-      zoom: 9,
-      projection: { name: "mercator" }
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    // Wait for style to load completely before setting flag
-    map.current.on('style.load', () => {
-      console.log('Style loaded event fired');
-      setIsStyleLoaded(true);
-    });
-
-    // Add click handler for adding waypoints only after style loads
-    map.current.on('style.load', () => {
-      map.current?.on("click", (e) => {
-        onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
-      });
-    });
-
-    return () => {
-      setIsStyleLoaded(false);
-      map.current?.remove();
-    };
-  }, [mapboxToken, onAddWaypoint]);
-
-  // Update waypoint markers and routes - only when style is ready
-  useEffect(() => {
-    if (!map.current || !isStyleLoaded) {
-      console.log('Skipping waypoint update - style not ready');
+  // Function to update waypoints and routes
+  const updateWaypoints = () => {
+    if (!map.current || !styleLoaded.current) {
+      console.log('Cannot update waypoints - style not ready');
       return;
     }
 
-    console.log('Processing waypoints:', waypoints.length);
+    console.log('Updating waypoints:', waypoints.length);
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
@@ -172,7 +138,47 @@ export function MapComponent({
       map.current.removeLayer("route");
       map.current.removeSource("route");
     }
-  }, [waypoints, onUpdateWaypoint, isStyleLoaded]);
+  };
+
+  useEffect(() => {
+    if (!mapContainer.current || !mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") return;
+
+    mapboxgl.accessToken = mapboxToken;
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
+      center: [-74.5, 40],
+      zoom: 9,
+      projection: { name: "mercator" }
+    });
+
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    // Everything map-related happens ONLY after style loads
+    map.current.on('style.load', () => {
+      console.log('Style loaded - initializing map features');
+      styleLoaded.current = true;
+      
+      // Add click handler
+      map.current?.on("click", (e) => {
+        onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
+      });
+      
+      // Trigger waypoint update now that style is ready
+      updateWaypoints();
+    });
+
+    return () => {
+      styleLoaded.current = false;
+      map.current?.remove();
+    };
+  }, [mapboxToken, onAddWaypoint]);
+
+  // Call updateWaypoints when waypoints change
+  useEffect(() => {
+    updateWaypoints();
+  }, [waypoints, onUpdateWaypoint]);
 
   if (!mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") {
     return (
