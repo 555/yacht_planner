@@ -249,10 +249,11 @@ export function MapComponent({
     <div className="relative">
       <div
         ref={mapContainer}
-        className="h-full w-full rounded-lg shadow-lg"
+        className="w-full rounded-lg shadow-lg"
         style={{
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          height: '100%'
         }}
       />
       <style>{`
