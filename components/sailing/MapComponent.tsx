@@ -164,7 +164,7 @@ export function MapComponent({
       container: mapContainer.current,
       style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
       center: [-74.5, 40],
-      zoom: 4,
+      zoom: 2,
       projection: { name: "mercator" }
     });
 
