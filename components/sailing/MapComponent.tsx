@@ -29,6 +29,7 @@ export function MapComponent({
   const styleLoaded = useRef<boolean>(false);
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
   const dragStartPositions = useRef<Map<number, mapboxgl.LngLat>>(new Map());
+  const recentlyDragged = useRef<Set<number>>(new Set());
   const { toast } = useToast();
 
   useEffect(() => {
@@ -106,16 +107,16 @@ export function MapComponent({
       
       console.log('Element created:', el, 'with text:', el.textContent);
 
-      // Add click handler to remove waypoint (disabled during drag)
+      // Add click handler to remove waypoint (disabled during drag and briefly after)
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log('Marker click event - waypoint:', waypoint.id, 'isDragging:', dragStartPositions.current.has(waypoint.id));
-        // Only allow removal if not currently dragging this marker
-        if (!dragStartPositions.current.has(waypoint.id)) {
+        console.log('Marker click event - waypoint:', waypoint.id, 'isDragging:', dragStartPositions.current.has(waypoint.id), 'recentlyDragged:', recentlyDragged.current.has(waypoint.id));
+        // Only allow removal if not currently dragging this marker AND not recently dragged
+        if (!dragStartPositions.current.has(waypoint.id) && !recentlyDragged.current.has(waypoint.id)) {
           console.log('Removing waypoint:', waypoint.id);
           onRemoveWaypoint(waypoint.id);
         } else {
-          console.log('Click blocked - marker is being dragged');
+          console.log('Click blocked - marker is being dragged or recently dragged');
         }
       });
 
@@ -189,6 +190,14 @@ export function MapComponent({
         // Always clean up drag state after dragend
         console.log('Cleaning up drag state for waypoint:', waypoint.id);
         dragStartPositions.current.delete(waypoint.id);
+        
+        // Mark as recently dragged to prevent immediate click removal
+        recentlyDragged.current.add(waypoint.id);
+        setTimeout(() => {
+          recentlyDragged.current.delete(waypoint.id);
+          console.log('Cleared recently dragged flag for waypoint:', waypoint.id);
+        }, 200); // 200ms delay to prevent click after drag
+        
         console.log('Final dragPositions size:', dragStartPositions.current.size);
       });
 
