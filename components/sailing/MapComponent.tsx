@@ -229,6 +229,8 @@ export function MapComponent({
       <style jsx>{`
         .mapboxgl-canvas-container {
           position: relative !important;
+          width: 100% !important;
+          height: 100% !important;
         }
         .mapboxgl-canvas {
           position: absolute !important;
