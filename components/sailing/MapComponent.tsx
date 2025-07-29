@@ -47,8 +47,15 @@ export function MapComponent({
 
     // Wait for style to load before allowing interactions
     map.current.on('style.load', () => {
+      console.log('Mapbox style loaded');
       setIsStyleLoaded(true);
     });
+
+    // Also check if style is already loaded (in case event already fired)
+    if (map.current.isStyleLoaded()) {
+      console.log('Mapbox style already loaded');
+      setIsStyleLoaded(true);
+    }
 
     // Add click handler for adding waypoints
     map.current.on("click", (e) => {
@@ -62,7 +69,11 @@ export function MapComponent({
 
   // Update waypoint markers
   useEffect(() => {
-    if (!map.current || !isStyleLoaded) return;
+    console.log('Waypoint effect running:', { mapExists: !!map.current, isStyleLoaded, waypointCount: waypoints.length });
+    if (!map.current || !isStyleLoaded) {
+      console.log('Skipping waypoint effect - map not ready');
+      return;
+    }
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
@@ -118,9 +129,11 @@ export function MapComponent({
 
     // Draw route line
     if (waypoints.length > 1) {
+      console.log('Drawing route with', waypoints.length, 'waypoints');
       const coordinates = waypoints.map(w => [w.lng, w.lat]);
       
       if (map.current.getSource("route")) {
+        console.log('Updating existing route source');
         (map.current.getSource("route") as mapboxgl.GeoJSONSource).setData({
           type: "Feature",
           properties: {},
@@ -130,6 +143,7 @@ export function MapComponent({
           }
         });
       } else {
+        console.log('Creating new route source');
         map.current.addSource("route", {
           type: "geojson",
           data: {
