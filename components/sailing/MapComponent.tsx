@@ -243,8 +243,10 @@ export function MapComponent({
         } else {
           if (originalPosition) {
             marker.setLngLat(originalPosition);
-            // Redraw the line to ensure proper positioning
-            updateRouteLineDisplay();
+            // Redraw the line after marker position settles
+            setTimeout(() => {
+              updateRouteLineDisplay();
+            }, 50);
             toast({
               title: "Invalid placement",
               description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
