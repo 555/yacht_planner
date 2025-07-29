@@ -27,6 +27,7 @@ export function MapComponent({
 
   useEffect(() => {
     // Set Mapbox token directly
+    console.log('Setting Mapbox token');
     setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
   }, []);
 
@@ -144,8 +145,10 @@ export function MapComponent({
   };
 
   useEffect(() => {
+    console.log('Map effect triggered - container:', !!mapContainer.current, 'token:', !!mapboxToken);
     if (!mapContainer.current || !mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") return;
 
+    console.log('Initializing Mapbox map');
     mapboxgl.accessToken = mapboxToken;
 
     map.current = new mapboxgl.Map({
@@ -156,6 +159,7 @@ export function MapComponent({
       projection: { name: "mercator" }
     });
 
+    console.log('Map created, adding controls');
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     // Everything map-related happens ONLY after style loads
@@ -168,9 +172,16 @@ export function MapComponent({
         console.log('Map clicked at:', e.lngLat.lng, e.lngLat.lat);
         onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
       });
+      
+      // If we have waypoints, update them now
+      if (waypoints.length > 0) {
+        console.log('Calling updateWaypoints from style.load');
+        updateWaypoints();
+      }
     });
 
     return () => {
+      console.log('Cleaning up map');
       styleLoaded.current = false;
       map.current?.remove();
     };
