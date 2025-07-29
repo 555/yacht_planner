@@ -91,6 +91,28 @@ export function MapComponent({
     }
   }, []);
 
+  // Function to redraw route line
+  const updateRouteLineDisplay = useCallback(() => {
+    if (!map.current || !styleLoaded.current || waypoints.length < 2) return;
+    
+    const coordinates = waypoints.map(w => [w.lng, w.lat]);
+    
+    try {
+      if (map.current.getSource("route")) {
+        (map.current.getSource("route") as mapboxgl.GeoJSONSource).setData({
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates
+          }
+        });
+      }
+    } catch (error) {
+      // Silently handle route redraw errors
+    }
+  }, [waypoints]);
+
   // Optimized waypoint update function with accessibility
   const updateWaypoints = useCallback(() => {
     if (!map.current || !styleLoaded.current) return;
@@ -221,6 +243,8 @@ export function MapComponent({
         } else {
           if (originalPosition) {
             marker.setLngLat(originalPosition);
+            // Redraw the line to ensure proper positioning
+            updateRouteLineDisplay();
             toast({
               title: "Invalid placement",
               description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
