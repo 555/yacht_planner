@@ -238,15 +238,11 @@ export function MapComponent({
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
-          width: 100% !important;
-          height: 600px !important;
         }
         .mapboxgl-canvas {
           position: absolute !important;
           top: 0 !important;
           left: 0 !important;
-          width: 100% !important;
-          height: 600px !important;
         }
       `}</style>
       {waypoints.length === 0 && (
