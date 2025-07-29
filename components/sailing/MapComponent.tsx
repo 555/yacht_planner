@@ -26,6 +26,7 @@ export function MapComponent({
   const markers = useRef<Map<number, mapboxgl.Marker>>(new Map());
   const [mapboxToken, setMapboxToken] = useState<string>("");
   const styleLoaded = useRef<boolean>(false);
+  const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // Set Mapbox token directly
@@ -175,6 +176,31 @@ export function MapComponent({
       map.current.removeLayer("route");
       map.current.removeSource("route");
     }
+    
+    // Auto-zoom to fit route after inactivity
+    const resetInactivityTimer = () => {
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+      }
+      
+      if (waypoints.length > 1) {
+        inactivityTimer.current = setTimeout(() => {
+          if (!map.current) return;
+          
+          const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
+          const bounds = new mapboxgl.LngLatBounds();
+          coordinates.forEach(coord => bounds.extend(coord));
+          
+          map.current.fitBounds(bounds, {
+            padding: 80,
+            duration: 2000,
+            easing: (t) => t * (2 - t) // gentle ease-out function
+          });
+        }, 1000);
+      }
+    };
+    
+    resetInactivityTimer();
   }, [waypoints, onUpdateWaypoint, onRemoveWaypoint]);
 
   useEffect(() => {
@@ -266,6 +292,29 @@ export function MapComponent({
       console.log('Style loaded - initializing map features');
       styleLoaded.current = true;
       
+      // Reset inactivity timer on user interaction
+      const resetTimer = () => {
+        if (inactivityTimer.current) {
+          clearTimeout(inactivityTimer.current);
+        }
+        
+        if (waypoints.length > 1) {
+          inactivityTimer.current = setTimeout(() => {
+            if (!map.current) return;
+            
+            const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
+            const bounds = new mapboxgl.LngLatBounds();
+            coordinates.forEach(coord => bounds.extend(coord));
+            
+            map.current.fitBounds(bounds, {
+              padding: 80,
+              duration: 2000,
+              easing: (t) => t * (2 - t) // gentle ease-out function
+            });
+          }, 1000);
+        }
+      };
+      
       // Check if point is on water
       const isOnWater = (point: mapboxgl.Point) => {
         const features = map.current?.queryRenderedFeatures(point);
@@ -290,8 +339,10 @@ export function MapComponent({
         return waterFeatures.length > 0;
       };
       
-      // Add mousemove handler for cursor changes
+      // Add mousemove handler for cursor changes and reset timer
       map.current?.on("mousemove", (e) => {
+        resetTimer();
+        
         const canvas = map.current?.getCanvas();
         if (!canvas) return;
         
@@ -308,14 +359,21 @@ export function MapComponent({
         }
       });
       
-      // Add click handler with water detection
+      // Add click handler with water detection and reset timer
       map.current?.on("click", (e) => {
+        resetTimer();
         console.log('Map clicked at:', e.lngLat.lng, e.lngLat.lat);
         
         if (isOnWater(e.point)) {
           onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
         }
       });
+      
+      // Reset timer on other map interactions
+      map.current?.on("drag", resetTimer);
+      map.current?.on("zoom", resetTimer);
+      map.current?.on("pitch", resetTimer);
+      map.current?.on("rotate", resetTimer);
       
       // If we have waypoints, update them now
       if (waypoints.length > 0) {
@@ -327,6 +385,9 @@ export function MapComponent({
     return () => {
       console.log('Cleaning up map');
       styleLoaded.current = false;
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+      }
       window.removeEventListener('resize', handleResize);
       map.current?.remove();
     };
