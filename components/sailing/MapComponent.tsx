@@ -32,12 +32,13 @@ export function MapComponent({
 
   // Function to update waypoints and routes
   const updateWaypoints = () => {
+    console.log('updateWaypoints called - map:', !!map.current, 'styleLoaded:', styleLoaded.current, 'waypoints:', waypoints.length);
     if (!map.current || !styleLoaded.current) {
       console.log('Cannot update waypoints - style not ready');
       return;
     }
 
-    console.log('Updating waypoints:', waypoints.length);
+    console.log('Updating waypoints:', waypoints.length, 'waypoints data:', waypoints);
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
@@ -162,10 +163,12 @@ export function MapComponent({
       
       // Add click handler
       map.current?.on("click", (e) => {
+        console.log('Map clicked at:', e.lngLat.lng, e.lngLat.lat);
         onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
       });
       
       // Trigger waypoint update now that style is ready
+      console.log('Calling updateWaypoints from style.load with waypoints:', waypoints.length);
       updateWaypoints();
     });
 
