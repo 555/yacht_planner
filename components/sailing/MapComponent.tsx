@@ -295,10 +295,10 @@ export function MapComponent({
               "line-cap": "round"
             },
             paint: {
-              "line-color": "hsl(var(--primary))",
-              "line-width": 3,
+              "line-color": "#3b82f6",
+              "line-width": 4,
               "line-dasharray": [2, 3],
-              "line-opacity": 0.8
+              "line-opacity": 0.9
             }
           });
         }
