@@ -232,10 +232,14 @@ export function MapComponent({
         .mapboxgl-canvas-container {
           position: relative !important;
           width: 100% !important;
-          height: 600px !important;
+          height: 100% !important;
         }
         .mapboxgl-canvas {
           position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
         }
       `}</style>
       {waypoints.length === 0 && (
