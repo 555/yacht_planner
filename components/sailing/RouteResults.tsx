@@ -65,6 +65,58 @@ export function RouteResults({
     );
   }
 
+  if (waypoints.length === 1) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Route Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground text-sm">
+              Add at least 2 waypoints to see route summary
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle>Waypoints</CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={onClearRoute}
+            >
+              Clear Route
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {waypoints.map((waypoint, index) => (
+              <div key={waypoint.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Badge variant="secondary">{index + 1}</Badge>
+                  <div>
+                    <div className="font-medium text-sm">{waypoint.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {waypoint.lat.toFixed(4)}, {waypoint.lng.toFixed(4)}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onRemoveWaypoint(waypoint.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const distanceUnit = settings.units === "imperial" ? "nm" : "km";
   const fuelUnit = settings.units === "imperial" ? "gal" : "L";
 
