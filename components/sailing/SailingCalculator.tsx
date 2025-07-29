@@ -77,6 +77,7 @@ export function SailingCalculator() {
             waypoints={waypoints}
             onAddWaypoint={addWaypoint}
             onUpdateWaypoint={updateWaypoint}
+            onRemoveWaypoint={removeWaypoint}
             marinas={marinas}
             selectedWaypointMarinas={selectedWaypointMarinas}
           />

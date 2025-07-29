@@ -8,6 +8,7 @@ interface MapComponentProps {
   waypoints: Waypoint[];
   onAddWaypoint: (lng: number, lat: number) => void;
   onUpdateWaypoint: (id: number, lng: number, lat: number) => void;
+  onRemoveWaypoint: (id: number) => void;
   marinas: Marina[];
   selectedWaypointMarinas: Record<number, Marina[]>;
 }
@@ -16,6 +17,7 @@ export function MapComponent({
   waypoints,
   onAddWaypoint,
   onUpdateWaypoint,
+  onRemoveWaypoint,
   marinas,
   selectedWaypointMarinas
 }: MapComponentProps) {
@@ -76,6 +78,12 @@ export function MapComponent({
       
       console.log('Element created:', el, 'with text:', el.textContent);
 
+      // Add click handler to remove waypoint
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onRemoveWaypoint(waypoint.id);
+      });
+
       const marker = new mapboxgl.Marker({
         element: el,
         draggable: true
@@ -97,6 +105,9 @@ export function MapComponent({
             <h3 class="font-semibold">${waypoint.name}</h3>
             <p class="text-sm text-muted-foreground">
               ${waypoint.lat.toFixed(6)}, ${waypoint.lng.toFixed(6)}
+            </p>
+            <p class="text-xs text-muted-foreground mt-1">
+              Click marker to remove
             </p>
           </div>
         `);
@@ -154,7 +165,7 @@ export function MapComponent({
       map.current.removeLayer("route");
       map.current.removeSource("route");
     }
-  }, [waypoints, onUpdateWaypoint]);
+  }, [waypoints, onUpdateWaypoint, onRemoveWaypoint]);
 
   useEffect(() => {
     console.log('Map effect triggered - container:', !!mapContainer.current, 'token:', !!mapboxToken);
