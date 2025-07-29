@@ -144,7 +144,7 @@ export function MapComponent({
             "line-cap": "round"
           },
           paint: {
-            "line-color": "hsl(var(--primary))",
+            "line-color": "#3b82f6",
             "line-width": 3,
             "line-dasharray": [5, 5]
           }
