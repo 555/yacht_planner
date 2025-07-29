@@ -178,16 +178,25 @@ export function MapComponent({
     const syncContainerDimensions = () => {
       if (!map.current || !mapContainer.current) return;
       
+      // Remove existing inline styles
+      mapContainer.current.style.removeProperty('width');
+      mapContainer.current.style.removeProperty('height');
+      
+      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
+      if (canvas) {
+        canvas.style.removeProperty('width');
+        canvas.style.removeProperty('height');
+      }
+      
+      // Measure the container dimensions
       const containerRect = mapContainer.current.getBoundingClientRect();
       const widthPx = `${containerRect.width}px`;
       const heightPx = `${containerRect.height}px`;
       
-      // Update map container inline styles
+      // Set new inline dimensions
       mapContainer.current.style.width = widthPx;
       mapContainer.current.style.height = heightPx;
       
-      // Update canvas dimensions
-      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
       if (canvas) {
         canvas.style.width = widthPx;
         canvas.style.height = heightPx;
