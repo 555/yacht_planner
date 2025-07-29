@@ -222,7 +222,18 @@ export function MapComponent({
       <div
         ref={mapContainer}
         className="h-[600px] w-full rounded-lg shadow-lg"
+        style={{
+          position: 'relative'
+        }}
       />
+      <style jsx>{`
+        .mapboxgl-canvas-container {
+          position: relative !important;
+        }
+        .mapboxgl-canvas {
+          position: absolute !important;
+        }
+      `}</style>
       {waypoints.length === 0 && (
         <div className="absolute top-4 left-4 bg-card p-4 rounded-lg shadow-md border">
           <p className="text-sm text-muted-foreground">
