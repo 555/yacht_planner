@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { CalculationSettings } from "@/types/sailing";
 
 interface CalculatorControlsProps {
@@ -20,8 +19,8 @@ export function CalculatorControls({
     onSettingsChange({ ...settings, [key]: value });
   };
 
-  const toggleUnits = () => {
-    const newUnits: "imperial" | "metric" = settings.units === "imperial" ? "metric" : "imperial";
+  const setUnits = (newUnits: "imperial" | "metric") => {
+    if (newUnits === settings.units) return;
     
     let newSettings: CalculationSettings = { ...settings, units: newUnits };
     
@@ -46,15 +45,26 @@ export function CalculatorControls({
         <CardTitle>Vessel Settings</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="units"
-            checked={settings.units === "metric"}
-            onCheckedChange={toggleUnits}
-          />
-          <Label htmlFor="units">
-            {settings.units === "imperial" ? "Imperial" : "Metric"} Units
-          </Label>
+        <div className="space-y-2">
+          <Label>Units</Label>
+          <div className="flex space-x-1">
+            <Button
+              variant={settings.units === "imperial" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setUnits("imperial")}
+              className={settings.units === "imperial" ? ".-active" : ""}
+            >
+              Imperial
+            </Button>
+            <Button
+              variant={settings.units === "metric" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setUnits("metric")}
+              className={settings.units === "metric" ? ".-active" : ""}
+            >
+              Metric
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-2">
