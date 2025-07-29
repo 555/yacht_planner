@@ -28,8 +28,13 @@ export function MapComponent({
     // Get Mapbox token from Supabase secrets
     const getMapboxToken = async () => {
       try {
-        // For now, we'll use a placeholder - user will provide their token
-        setMapboxToken("YOUR_MAPBOX_TOKEN_HERE");
+        const response = await fetch('/api/get-mapbox-token');
+        if (response.ok) {
+          const data = await response.json();
+          setMapboxToken(data.token);
+        } else {
+          console.error("Failed to get Mapbox token");
+        }
       } catch (error) {
         console.error("Error getting Mapbox token:", error);
       }
