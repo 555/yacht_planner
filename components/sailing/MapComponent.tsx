@@ -145,9 +145,10 @@ export function MapComponent({
           },
           paint: {
             "line-color": "hsl(var(--primary))",
-            "line-width": 3
+            "line-width": 3,
+            "line-dasharray": [5, 5]
           }
-        });
+        }, "waterway-label");
       }
     } else if (map.current.getLayer("route")) {
       map.current.removeLayer("route");
