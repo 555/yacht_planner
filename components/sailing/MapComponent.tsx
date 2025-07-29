@@ -230,17 +230,18 @@ export function MapComponent({
     // Sync dimensions on resize
     map.current.on('resize', syncContainerDimensions);
     
-    // Add window resize listener
-    const handleWindowResize = () => {
+    // Create ResizeObserver to watch the map container
+    const resizeObserver = new ResizeObserver(() => {
       syncContainerDimensions();
-    };
+    });
     
-    window.addEventListener('resize', handleWindowResize);
+    // Start observing the map container
+    resizeObserver.observe(mapContainer.current);
 
     return () => {
       console.log('Cleaning up map');
       styleLoaded.current = false;
-      window.removeEventListener('resize', handleWindowResize);
+      resizeObserver.disconnect();
       map.current?.remove();
     };
   }, [mapboxToken, onAddWaypoint]);
