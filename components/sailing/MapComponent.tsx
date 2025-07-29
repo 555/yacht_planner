@@ -225,12 +225,19 @@ export function MapComponent({
         ref={mapContainer}
         className="h-[600px] w-full rounded-lg shadow-lg"
         style={{
-          position: 'relative'
+          position: 'relative',
+          overflow: 'hidden'
         }}
       />
       <style>{`
+        .mapboxgl-map {
+          width: 100% !important;
+          height: 100% !important;
+        }
         .mapboxgl-canvas-container {
-          position: relative !important;
+          position: absolute !important;
+          top: 0 !important;
+          left: 0 !important;
           width: 100% !important;
           height: 100% !important;
         }
