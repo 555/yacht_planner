@@ -536,10 +536,9 @@ export function MapComponent({
       
       <div
         ref={mapContainer}
-        className="w-full shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="w-full shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 overflow-hidden"
         style={{
           position: 'relative',
-          overflow: 'hidden',
           height: '100%',
           borderRadius: '1rem'
         }}
