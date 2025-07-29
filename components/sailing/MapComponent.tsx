@@ -183,7 +183,15 @@ export function MapComponent({
       }
       
       console.log('handleResize: removing styles');
-      // Remove all inline styles first
+      
+      // Find the actual .map-container element (parent container)
+      const actualMapContainer = mapContainer.current.closest('.map-container') as HTMLElement;
+      if (actualMapContainer) {
+        console.log('handleResize: found .map-container, removing styles');
+        actualMapContainer.removeAttribute('style');
+      }
+      
+      // Also remove styles from our ref container
       mapContainer.current.removeAttribute('style');
       
       const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
@@ -193,16 +201,25 @@ export function MapComponent({
       }
       
       // Force a reflow to ensure styles are completely cleared
+      if (actualMapContainer) {
+        actualMapContainer.offsetHeight;
+      }
       mapContainer.current.offsetHeight;
       
       // Measure the container dimensions
-      const containerRect = mapContainer.current.getBoundingClientRect();
+      const containerToMeasure = actualMapContainer || mapContainer.current;
+      const containerRect = containerToMeasure.getBoundingClientRect();
       const widthPx = `${containerRect.width}px`;
       const heightPx = `${containerRect.height}px`;
       
       console.log('handleResize: new dimensions', widthPx, heightPx);
       
-      // Set new inline dimensions
+      // Set new inline dimensions on the actual container
+      if (actualMapContainer) {
+        actualMapContainer.style.width = widthPx;
+        actualMapContainer.style.height = heightPx;
+      }
+      
       mapContainer.current.style.width = widthPx;
       mapContainer.current.style.height = heightPx;
       
