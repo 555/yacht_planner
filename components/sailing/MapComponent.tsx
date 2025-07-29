@@ -269,7 +269,7 @@ export function MapComponent({
       map.current.removeSource("route");
     }
     
-    // Auto-zoom to fit route after inactivity
+    // Auto-zoom to fit route after inactivity with nice framing
     const resetInactivityTimer = () => {
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
@@ -284,8 +284,9 @@ export function MapComponent({
           coordinates.forEach(coord => bounds.extend(coord));
           
           map.current.fitBounds(bounds, {
-            padding: 80,
-            duration: 2000,
+            padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
+            maxZoom: 8, // Prevent zooming too close for short routes
+            duration: 2500, // Slightly longer animation for smoother feel
             easing: (t) => t * (2 - t) // gentle ease-out function
           });
         }, 1000);
@@ -384,7 +385,7 @@ export function MapComponent({
       console.log('Style loaded - initializing map features');
       styleLoaded.current = true;
       
-      // Reset inactivity timer on user interaction
+      // Reset inactivity timer on user interaction with enhanced framing
       const resetTimer = () => {
         if (inactivityTimer.current) {
           clearTimeout(inactivityTimer.current);
@@ -399,8 +400,9 @@ export function MapComponent({
             coordinates.forEach(coord => bounds.extend(coord));
             
             map.current.fitBounds(bounds, {
-              padding: 80,
-              duration: 2000,
+              padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
+              maxZoom: 8, // Prevent zooming too close for short routes
+              duration: 2500, // Slightly longer animation for smoother feel
               easing: (t) => t * (2 - t) // gentle ease-out function
             });
           }, 1000);
