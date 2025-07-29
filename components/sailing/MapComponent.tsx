@@ -173,10 +173,33 @@ export function MapComponent({
     console.log('Map created, adding controls');
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
+    // Function to sync container dimensions with canvas
+    const syncContainerDimensions = () => {
+      if (!map.current || !mapContainer.current) return;
+      
+      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
+      const container = mapContainer.current.querySelector('.mapboxgl-canvas-container') as HTMLElement;
+      const mapElement = mapContainer.current.querySelector('.mapboxgl-map') as HTMLElement;
+      
+      if (canvas && container && mapElement) {
+        const canvasStyle = window.getComputedStyle(canvas);
+        const width = canvasStyle.width;
+        const height = canvasStyle.height;
+        
+        container.style.width = width;
+        container.style.height = height;
+        mapElement.style.width = width;
+        mapElement.style.height = height;
+      }
+    };
+
     // Everything map-related happens ONLY after style loads
     map.current.on('style.load', () => {
       console.log('Style loaded - initializing map features');
       styleLoaded.current = true;
+      
+      // Sync dimensions after style loads
+      setTimeout(syncContainerDimensions, 100);
       
       // Add click handler
       map.current?.on("click", (e) => {
@@ -190,6 +213,9 @@ export function MapComponent({
         updateWaypoints();
       }
     });
+
+    // Sync dimensions on resize
+    map.current.on('resize', syncContainerDimensions);
 
     return () => {
       console.log('Cleaning up map');
