@@ -63,7 +63,7 @@ export function SailingCalculator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 min-h-0">
         <div 
-          className="lg:col-span-3 map-container" 
+          className="lg:col-span-3 map-container rounded-[1rem]" 
           data-lov-id="components/sailing/SailingCalculator.tsx:61:8"
           ref={(el) => {
             if (el) {
