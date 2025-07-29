@@ -170,10 +170,14 @@ export function MapComponent({
 
       const marker = new mapboxgl.Marker({
         element: el,
-        draggable: true
-      })
-        .setLngLat([waypoint.lng, waypoint.lat])
-        .addTo(map.current!);
+        draggable: true,
+        anchor: 'center'
+      });
+      
+      // Ensure map container dimensions are ready before positioning
+      requestAnimationFrame(() => {
+        marker.setLngLat([waypoint.lng, waypoint.lat]).addTo(map.current!);
+      });
 
       // Optimized drag handlers
       marker.on("dragstart", () => {
