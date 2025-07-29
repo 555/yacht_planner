@@ -145,8 +145,7 @@ export function MapComponent({
         z-index: 1000;
         position: absolute;
         outline: none;
-        margin-top: -50%;
-        margin-left: -50%;
+        transform: translate(-50%, -50%);
       `;
       
       // Enhanced hover and focus effects (avoid transform to prevent positioning issues)
