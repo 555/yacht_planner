@@ -176,7 +176,7 @@ export function MapComponent({
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/alongsideyachts/clesibypt00hj01qfa6iqqgo5",
+      style: "mapbox://styles/alongsideyachts/cmdki7mng000l01si77fv8p5x",
       center: [-74.5, 40],
       zoom: 2,
       maxZoom: 9.6,
