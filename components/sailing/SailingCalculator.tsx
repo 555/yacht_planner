@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { MapComponent } from "./MapComponent";
 import { CalculatorControls } from "./CalculatorControls";
 import { RouteResults } from "./RouteResults";
@@ -17,33 +17,37 @@ export function SailingCalculator() {
   const [marinas, setMarinas] = useState<Marina[]>([]);
   const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
 
-  const addWaypoint = (lng: number, lat: number) => {
-    const newWaypoint: Waypoint = {
-      id: Date.now(),
-      lng,
-      lat,
-      name: `Waypoint ${waypoints.length + 1}`
-    };
-    setWaypoints([...waypoints, newWaypoint]);
-  };
+  const addWaypoint = useCallback((lng: number, lat: number) => {
+    setWaypoints(prev => {
+      const newWaypoint: Waypoint = {
+        id: Date.now(),
+        lng,
+        lat,
+        name: `Waypoint ${prev.length + 1}`
+      };
+      return [...prev, newWaypoint];
+    });
+  }, []);
 
-  const removeWaypoint = (id: number) => {
-    setWaypoints(waypoints.filter(w => w.id !== id));
-    const newSelected = { ...selectedWaypointMarinas };
-    delete newSelected[id];
-    setSelectedWaypointMarinas(newSelected);
-  };
+  const removeWaypoint = useCallback((id: number) => {
+    setWaypoints(prev => prev.filter(w => w.id !== id));
+    setSelectedWaypointMarinas(prev => {
+      const newSelected = { ...prev };
+      delete newSelected[id];
+      return newSelected;
+    });
+  }, []);
 
-  const updateWaypoint = (id: number, lng: number, lat: number) => {
-    setWaypoints(waypoints.map(w => 
+  const updateWaypoint = useCallback((id: number, lng: number, lat: number) => {
+    setWaypoints(prev => prev.map(w => 
       w.id === id ? { ...w, lng, lat } : w
     ));
-  };
+  }, []);
 
-  const clearRoute = () => {
+  const clearRoute = useCallback(() => {
     setWaypoints([]);
     setSelectedWaypointMarinas({});
-  };
+  }, []);
 
   return (
     <div className="container mx-auto p-6 space-y-6">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import { Waypoint, Marina } from "@/types/sailing";
 
@@ -31,8 +31,8 @@ export function MapComponent({
     setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
   }, []);
 
-  // Function to update waypoints and routes
-  const updateWaypoints = () => {
+  // Memoize the updateWaypoints function to prevent unnecessary re-renders
+  const updateWaypoints = useCallback(() => {
     console.log('updateWaypoints called - map:', !!map.current, 'styleLoaded:', styleLoaded.current, 'waypoints:', waypoints.length);
     if (!map.current || !styleLoaded.current) {
       console.log('Cannot update waypoints - style not ready');
@@ -153,7 +153,7 @@ export function MapComponent({
       map.current.removeLayer("route");
       map.current.removeSource("route");
     }
-  };
+  }, [waypoints, onUpdateWaypoint]);
 
   useEffect(() => {
     console.log('Map effect triggered - container:', !!mapContainer.current, 'token:', !!mapboxToken);
@@ -230,7 +230,7 @@ export function MapComponent({
     if (styleLoaded.current) {
       updateWaypoints();
     }
-  }, [waypoints]);
+  }, [updateWaypoints]);
 
   if (!mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") {
     return (
