@@ -271,17 +271,25 @@ export function MapComponent({
     
     // Auto-zoom to fit route after inactivity with nice framing
     const resetInactivityTimer = () => {
+      console.log('resetInactivityTimer called - waypoints:', waypoints.length);
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
+        console.log('Cleared existing inactivity timer');
       }
       
       if (waypoints.length > 1) {
+        console.log('Setting new inactivity timer for', waypoints.length, 'waypoints');
         inactivityTimer.current = setTimeout(() => {
-          if (!map.current) return;
+          console.log('Inactivity timer triggered - executing fitBounds');
+          if (!map.current) {
+            console.log('Map not available for fitBounds');
+            return;
+          }
           
           const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
           const bounds = new mapboxgl.LngLatBounds();
           coordinates.forEach(coord => bounds.extend(coord));
+          console.log('Fitting bounds for coordinates:', coordinates);
           
           map.current.fitBounds(bounds, {
             padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
@@ -290,9 +298,12 @@ export function MapComponent({
             easing: (t) => t * (2 - t) // gentle ease-out function
           });
         }, 1000);
+      } else {
+        console.log('Not setting timer - need more than 1 waypoint');
       }
     };
     
+    console.log('Calling resetInactivityTimer from updateWaypoints');
     resetInactivityTimer();
   }, [waypoints, onUpdateWaypoint, onRemoveWaypoint, isOnWater, toast]);
 
@@ -387,17 +398,25 @@ export function MapComponent({
       
       // Reset inactivity timer on user interaction with enhanced framing
       const resetTimer = () => {
+        console.log('resetTimer called from map interaction - waypoints:', waypoints.length);
         if (inactivityTimer.current) {
           clearTimeout(inactivityTimer.current);
+          console.log('Cleared existing timer from map interaction');
         }
         
         if (waypoints.length > 1) {
+          console.log('Setting new timer from map interaction');
           inactivityTimer.current = setTimeout(() => {
-            if (!map.current) return;
+            console.log('Map interaction timer triggered - executing fitBounds');
+            if (!map.current) {
+              console.log('Map not available for fitBounds from interaction');
+              return;
+            }
             
             const coordinates = waypoints.map(w => [w.lng, w.lat] as [number, number]);
             const bounds = new mapboxgl.LngLatBounds();
             coordinates.forEach(coord => bounds.extend(coord));
+            console.log('Fitting bounds from interaction for coordinates:', coordinates);
             
             map.current.fitBounds(bounds, {
               padding: { top: 100, bottom: 100, left: 100, right: 100 }, // Generous padding for nice framing
@@ -406,6 +425,8 @@ export function MapComponent({
               easing: (t) => t * (2 - t) // gentle ease-out function
             });
           }, 1000);
+        } else {
+          console.log('Not setting timer from interaction - need more than 1 waypoint');
         }
       };
       
