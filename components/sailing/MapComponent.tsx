@@ -259,7 +259,7 @@ export function MapComponent({
       // Check if point is on water
       const isOnWater = (point: mapboxgl.Point) => {
         const features = map.current?.queryRenderedFeatures(point);
-        if (!features) return true;
+        if (!features) return false;
         
         // Debug: log what features are available
         if (features.length > 0) {
@@ -271,22 +271,13 @@ export function MapComponent({
           })));
         }
         
-        // Check for land-related features - adjust based on your style
-        const landFeatures = features.filter(feature => {
+        // Check for water features - look specifically for water source layer
+        const waterFeatures = features.filter(feature => {
           const sourceLayer = feature.sourceLayer;
-          const layerId = feature.layer?.id;
-          return sourceLayer && (
-            sourceLayer.includes('landuse') ||
-            sourceLayer.includes('building') ||
-            sourceLayer.includes('road') ||
-            sourceLayer.includes('landcover') ||
-            sourceLayer === 'land' ||
-            layerId?.includes('land') ||
-            layerId?.includes('building')
-          );
+          return sourceLayer === 'water';
         });
         
-        return landFeatures.length === 0;
+        return waterFeatures.length > 0;
       };
       
       // Add mousemove handler for cursor changes
