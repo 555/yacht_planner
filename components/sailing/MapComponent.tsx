@@ -300,7 +300,7 @@ export function MapComponent({
               "line-dasharray": [2, 3],
               "line-opacity": 0.8
             }
-          }, "waterway-label");
+          });
         }
       } catch (error) {
         // Silently handle route drawing errors
