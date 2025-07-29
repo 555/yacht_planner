@@ -26,15 +26,25 @@ export function RouteResults({
     const rounded = Math.round(cost);
     const str = rounded.toString();
     
-    if (str.length <= 6) {
+    if (str.length <= 3) {
+      // Up to 999 - no formatting needed
+      return str;
+    } else if (str.length <= 6) {
       // Up to 999,999 - just add commas for thousands
       return str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    } else {
-      // 1,000,000 and above - add spaces for hundreds of thousands
+    } else if (str.length <= 9) {
+      // 1,000,000 to 999,999,999 - add comma for millions and space after thousands
       const millions = str.slice(0, -6);
       const thousands = str.slice(-6, -3);
       const hundreds = str.slice(-3);
-      return `${millions} ${thousands},${hundreds}`;
+      return `${millions},${thousands} ${hundreds}`;
+    } else {
+      // 1,000,000,000 and above - full formatting
+      const billions = str.slice(0, -9);
+      const millions = str.slice(-9, -6);
+      const thousands = str.slice(-6, -3);
+      const hundreds = str.slice(-3);
+      return `${billions},${millions},${thousands} ${hundreds}`;
     }
   };
 
