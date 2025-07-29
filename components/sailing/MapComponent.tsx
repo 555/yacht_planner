@@ -174,11 +174,37 @@ export function MapComponent({
     console.log('Map created, adding controls');
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Simple resize handler - just call map.resize()
+    // Resize handler - remove styles, measure, set dimensions, and resize map
     const handleResize = () => {
-      if (map.current) {
-        map.current.resize();
+      if (!map.current || !mapContainer.current) return;
+      
+      // Remove all inline styles first
+      mapContainer.current.removeAttribute('style');
+      
+      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
+      if (canvas) {
+        canvas.removeAttribute('style');
       }
+      
+      // Force a reflow to ensure styles are completely cleared
+      mapContainer.current.offsetHeight;
+      
+      // Measure the container dimensions
+      const containerRect = mapContainer.current.getBoundingClientRect();
+      const widthPx = `${containerRect.width}px`;
+      const heightPx = `${containerRect.height}px`;
+      
+      // Set new inline dimensions
+      mapContainer.current.style.width = widthPx;
+      mapContainer.current.style.height = heightPx;
+      
+      if (canvas) {
+        canvas.style.width = widthPx;
+        canvas.style.height = heightPx;
+      }
+      
+      // Call map resize
+      map.current.resize();
     };
 
     // Everything map-related happens ONLY after style loads
