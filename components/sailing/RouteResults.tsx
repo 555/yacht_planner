@@ -22,6 +22,22 @@ export function RouteResults({
 }: RouteResultsProps) {
   const route = calculateRoute(waypoints, settings);
 
+  const formatCost = (cost: number) => {
+    const rounded = Math.round(cost);
+    const str = rounded.toString();
+    
+    if (str.length <= 6) {
+      // Up to 999,999 - just add commas for thousands
+      return str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    } else {
+      // 1,000,000 and above - add spaces for hundreds of thousands
+      const millions = str.slice(0, -6);
+      const thousands = str.slice(-6, -3);
+      const hundreds = str.slice(-3);
+      return `${millions} ${thousands},${hundreds}`;
+    }
+  };
+
   if (waypoints.length === 0) {
     return (
       <Card>
@@ -72,7 +88,7 @@ export function RouteResults({
             <div>
               <div className="font-medium">Total Cost</div>
               <div className="text-muted-foreground">
-                ${route.totalCost.toFixed(2)}
+                ${formatCost(route.totalCost)}
               </div>
             </div>
           </div>
