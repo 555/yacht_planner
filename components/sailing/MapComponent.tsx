@@ -297,7 +297,8 @@ export function MapComponent({
             paint: {
               "line-color": "hsl(var(--primary))",
               "line-width": 3,
-              "line-dasharray": [0.5, 2]
+              "line-dasharray": [2, 3],
+              "line-opacity": 0.8
             }
           }, "waterway-label");
         }
