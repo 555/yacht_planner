@@ -231,13 +231,13 @@ export function MapComponent({
     // Sync dimensions on resize
     map.current.on('resize', syncContainerDimensions);
     
-    // Create ResizeObserver to watch the body for window size changes
+    // Create ResizeObserver to watch the document element for viewport changes
     const resizeObserver = new ResizeObserver(() => {
       syncContainerDimensions();
     });
     
-    // Start observing the body element
-    resizeObserver.observe(document.body);
+    // Start observing the document element (html)
+    resizeObserver.observe(document.documentElement);
 
     return () => {
       console.log('Cleaning up map');
