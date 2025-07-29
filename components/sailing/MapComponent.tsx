@@ -174,24 +174,27 @@ export function MapComponent({
     console.log('Map created, adding controls');
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Function to sync container dimensions with canvas
+    // Function to sync canvas dimensions with container
     const syncContainerDimensions = () => {
       if (!map.current || !mapContainer.current) return;
       
-      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
-      const container = mapContainer.current.querySelector('.mapboxgl-canvas-container') as HTMLElement;
-      const mapElement = mapContainer.current.querySelector('.mapboxgl-map') as HTMLElement;
+      const containerRect = mapContainer.current.getBoundingClientRect();
+      const widthPx = `${containerRect.width}px`;
+      const heightPx = `${containerRect.height}px`;
       
-      if (canvas && container && mapElement) {
-        const canvasRect = canvas.getBoundingClientRect();
-        const widthPx = `${canvasRect.width}px`;
-        const heightPx = `${canvasRect.height}px`;
-        
-        container.style.width = widthPx;
-        container.style.height = heightPx;
-        mapElement.style.width = widthPx;
-        mapElement.style.height = heightPx;
+      // Update map container inline styles
+      mapContainer.current.style.width = widthPx;
+      mapContainer.current.style.height = heightPx;
+      
+      // Update canvas dimensions
+      const canvas = mapContainer.current.querySelector('.mapboxgl-canvas') as HTMLElement;
+      if (canvas) {
+        canvas.style.width = widthPx;
+        canvas.style.height = heightPx;
       }
+      
+      // Trigger map resize
+      map.current.resize();
     };
 
     // Everything map-related happens ONLY after style loads
@@ -217,10 +220,18 @@ export function MapComponent({
 
     // Sync dimensions on resize
     map.current.on('resize', syncContainerDimensions);
+    
+    // Add window resize listener
+    const handleWindowResize = () => {
+      syncContainerDimensions();
+    };
+    
+    window.addEventListener('resize', handleWindowResize);
 
     return () => {
       console.log('Cleaning up map');
       styleLoaded.current = false;
+      window.removeEventListener('resize', handleWindowResize);
       map.current?.remove();
     };
   }, [mapboxToken, onAddWaypoint]);
