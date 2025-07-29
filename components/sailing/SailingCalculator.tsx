@@ -50,7 +50,7 @@ export function SailingCalculator() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen p-6 space-y-6 overflow-scroll" data-component-path="components/sailing/SailingCalculator.tsx">
+    <div className="flex flex-col h-screen p-6 space-y-6" data-component-path="components/sailing/SailingCalculator.tsx">
       <div className="text-center space-y-4 flex-shrink-0">
         <h1 className="text-4xl font-bold text-foreground">
           Sailing Distance Calculator
@@ -82,7 +82,7 @@ export function SailingCalculator() {
           />
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-scroll">
           <CalculatorControls
             settings={settings}
             onSettingsChange={setSettings}
