@@ -23,6 +23,7 @@ export function MapComponent({
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
   const [mapboxToken, setMapboxToken] = useState<string>("");
+  const [isStyleLoaded, setIsStyleLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     // Set Mapbox token directly
@@ -44,6 +45,11 @@ export function MapComponent({
 
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
+    // Wait for style to load before allowing interactions
+    map.current.on('style.load', () => {
+      setIsStyleLoaded(true);
+    });
+
     // Add click handler for adding waypoints
     map.current.on("click", (e) => {
       onAddWaypoint(e.lngLat.lng, e.lngLat.lat);
@@ -56,7 +62,7 @@ export function MapComponent({
 
   // Update waypoint markers
   useEffect(() => {
-    if (!map.current) return;
+    if (!map.current || !isStyleLoaded) return;
 
     // Clear existing markers
     markers.current.forEach(marker => marker.remove());
@@ -154,7 +160,7 @@ export function MapComponent({
       map.current.removeLayer("route");
       map.current.removeSource("route");
     }
-  }, [waypoints, onUpdateWaypoint]);
+  }, [waypoints, onUpdateWaypoint, isStyleLoaded]);
 
   if (!mapboxToken || mapboxToken === "YOUR_MAPBOX_TOKEN_HERE") {
     return (
