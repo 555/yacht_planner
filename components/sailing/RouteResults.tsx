@@ -22,8 +22,8 @@ export function RouteResults({
 }: RouteResultsProps) {
   const route = calculateRoute(waypoints, settings);
 
-  const formatCost = (cost: number) => {
-    const rounded = Math.round(cost);
+  const formatNumber = (num: number) => {
+    const rounded = Math.ceil(num);
     const str = rounded.toString();
     
     if (str.length <= 3) {
@@ -77,7 +77,7 @@ export function RouteResults({
             <div>
               <div className="font-medium">Total Distance</div>
               <div className="text-muted-foreground">
-                {route.totalDistance.toFixed(1)} {distanceUnit}
+                {formatNumber(route.totalDistance)} {distanceUnit}
               </div>
             </div>
             <div>
@@ -92,13 +92,13 @@ export function RouteResults({
             <div>
               <div className="font-medium">Fuel Needed</div>
               <div className="text-muted-foreground">
-                {route.totalFuel.toFixed(1)} {fuelUnit}
+                {formatNumber(route.totalFuel)} {fuelUnit}
               </div>
             </div>
             <div>
               <div className="font-medium">Total Cost</div>
               <div className="text-muted-foreground">
-                ${formatCost(route.totalCost)}
+                ${formatNumber(route.totalCost)}
               </div>
             </div>
           </div>
