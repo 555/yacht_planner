@@ -122,14 +122,13 @@ export function MapComponent({
         box-shadow: 0 4px 8px rgba(34, 24, 150, 0.4);
         z-index: 1000;
         position: absolute;
-        transition: all 0.2s ease;
         outline: none;
       `;
       
       // Enhanced hover and focus effects (avoid transform to prevent positioning issues)
       const applyHoverState = () => {
-        el.style.background = '#e4d90f';
-        el.style.boxShadow = '0 6px 12px rgba(228, 217, 15, 0.4)';
+        el.style.background = '#dc2626';
+        el.style.boxShadow = '0 6px 12px rgba(220, 38, 38, 0.4)';
       };
       
       const applyNormalState = () => {
@@ -295,7 +294,7 @@ export function MapComponent({
               "line-cap": "round"
             },
             paint: {
-              "line-color": "#3b82f6",
+              "line-color": "#221896",
               "line-width": 4,
               "line-dasharray": [2, 3],
               "line-opacity": 0.9
