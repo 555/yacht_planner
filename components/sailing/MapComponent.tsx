@@ -246,7 +246,7 @@ export function MapComponent({
   }
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ height: '100%' }}>
       <div
         ref={mapContainer}
         className="w-full rounded-lg shadow-lg"
