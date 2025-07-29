@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import mapboxgl from "mapbox-gl";
 import { Waypoint, Marina } from "@/types/sailing";
-import { useToast } from "@/hooks/use-toast";
 
 interface MapComponentProps {
   waypoints: Waypoint[];
@@ -34,7 +33,6 @@ export function MapComponent({
   const recentlyDragged = useRef<Set<number>>(new Set());
   const currentWaypoints = useRef<Waypoint[]>(waypoints);
   const lastResetTime = useRef<number>(0);
-  const { toast } = useToast();
 
   // Keep waypoints ref updated
   useEffect(() => {
@@ -254,11 +252,6 @@ export function MapComponent({
             setTimeout(() => {
               updateRouteLineDisplay();
             }, 200);
-            toast({
-              title: "Invalid placement",
-              description: "Waypoints can only be placed on water. The marker has been returned to its original position.",
-              variant: "destructive",
-            });
           }
         }
         
@@ -349,7 +342,7 @@ export function MapComponent({
     
     // Trigger auto-zoom timer
     debouncedResetTimer();
-  }, [waypoints, onUpdateWaypoint, onRemoveWaypoint, isOnWater, toast, debouncedResetTimer]);
+  }, [waypoints, onUpdateWaypoint, onRemoveWaypoint, isOnWater, debouncedResetTimer]);
 
   // Main map initialization effect
   useEffect(() => {
