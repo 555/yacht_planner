@@ -123,6 +123,7 @@ export function MapComponent({
         z-index: 1000;
         position: absolute;
         outline: none;
+        transform: translate(-50%, -50%);
       `;
       
       // Enhanced hover and focus effects (avoid transform to prevent positioning issues)
