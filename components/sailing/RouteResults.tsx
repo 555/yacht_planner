@@ -57,7 +57,10 @@ export function RouteResults({
             <div>
               <div className="font-medium">Total Time</div>
               <div className="text-muted-foreground">
-                {Math.floor(route.totalTime)}h {Math.round((route.totalTime % 1) * 60)}m
+                {route.totalTime >= 24 
+                  ? `${Math.floor(route.totalTime / 24)}d ${Math.floor(route.totalTime % 24)}h`
+                  : `${Math.floor(route.totalTime)}h`
+                }
               </div>
             </div>
             <div>
