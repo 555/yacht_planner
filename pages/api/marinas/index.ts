@@ -166,7 +166,7 @@ async function handleWebflowQuery(req: NextApiRequest, res: NextApiResponse) {
 
     const data = await response.json();
     
-               // Transform Webflow "Marinas" collection data to our Marina interface
+               // Transform Webflow "marinas" collection data to our Marina interface
            const marinas = data.items?.map((item: any) => ({
              id: item.id,
              name: item.fieldData?.name || 'Unnamed Location',

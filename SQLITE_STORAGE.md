@@ -164,7 +164,7 @@ WEBFLOW_MARINA_COLLECTION_ID=your_collection_id
 ## Migration Path
 
 1. **Phase 1**: Deploy with SQLite support (current)
-2. **Phase 2**: Copy Locations collection to Marinas in Webflow
+2. **Phase 2**: ✅ Rename Locations collection to Marinas in Webflow (completed)
 3. **Phase 3**: Run initial sync to populate SQLite
 4. **Phase 4**: Test dynamic loading functionality
 5. **Phase 5**: Add more marinas to Webflow collection (>100 items)
