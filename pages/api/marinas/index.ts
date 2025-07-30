@@ -91,7 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const data = await response.json();
     
-               // Transform Webflow "Locations" collection data to our Marina interface
+               // Transform Webflow "Marinas" collection data to our Marina interface
            const marinas = data.items?.map((item: any) => ({
              id: item.id,
              name: item.fieldData?.name || 'Unnamed Location',
