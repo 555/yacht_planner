@@ -17,7 +17,7 @@
     {
       "binding": "DB",
       "database_name": "yacht_planner_db",
-      "database_id": "placeholder-will-be-assigned-on-deployment",
+      "database_id": "f01c700d-33d4-4669-a793-f034865b558e",
       "migrations_dir": "./migrations"
     }
   ]
