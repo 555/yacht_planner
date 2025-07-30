@@ -8,8 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "export": "next build && next export"
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
