@@ -27,6 +27,7 @@ function initRuntime() {
   Object.assign(process.versions, { node: "22.14.0", ...process.versions });
   globalThis.__dirname ??= "";
   globalThis.__filename ??= "";
+  import.meta.url ??= "file:///worker.js";
   const __original_fetch = globalThis.fetch;
   globalThis.fetch = (input, init2) => {
     if (init2) {
@@ -48,8 +49,13 @@ function initRuntime() {
   };
   Object.assign(globalThis, {
     Request: CustomRequest,
-    __BUILD_TIMESTAMP_MS__: 1753848493669,
-    __NEXT_BASE_PATH__: ""
+    __BUILD_TIMESTAMP_MS__: 1753894954297,
+    __NEXT_BASE_PATH__: "",
+    __ASSETS_RUN_WORKER_FIRST__: false,
+    // The external middleware will use the convertTo function of the `edge` converter
+    // by default it will try to fetch the request, but since we are running everything in the same worker
+    // we need to use the request as is.
+    __dangerous_ON_edge_converter_returns_request: true
   });
 }
 function populateProcessEnv(url, env) {
@@ -71,6 +77,10 @@ function populateProcessEnv(url, env) {
       port: url.port
     }
   });
+  process.env.__NEXT_PRIVATE_ORIGIN = url.origin;
+  if ("") {
+    process.env.DEPLOYMENT_ID = "";
+  }
 }
 export {
   runWithCloudflareRequestContext

@@ -1,11 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "alongsideyachts",
-  "pages_build_output_dir": ".next",
+  "main": "src/worker.js",
   "compatibility_date": "2025-03-01",
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "assets": {
+    "directory": ".next",
+    "binding": "ASSETS"
+  },
   "d1_databases": [
     {
       "binding": "DB",

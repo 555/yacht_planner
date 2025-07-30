@@ -26,6 +26,9 @@ const nextConfig: NextConfig = {
     dirs: ['pages', 'components', 'lib', 'types', 'utils']
   },
   
+  // Enable standalone output for OpenNext CloudFlare
+  output: 'standalone',
+  
   // Experimental features
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
