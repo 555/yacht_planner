@@ -1,5 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   // Configure the base path and asset prefix for Webflow Cloud deployment
   // Only apply these in production or when specifically set via environment variables
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
