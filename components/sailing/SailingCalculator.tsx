@@ -32,30 +32,43 @@ export function SailingCalculator() {
     }
   };
 
-  // Initialize state with localStorage values
-  const [waypoints, setWaypoints] = useState<Waypoint[]>(() => 
-    loadFromStorage(WAYPOINTS_KEY, [])
-  );
-  const [settings, setSettings] = useState<CalculationSettings>(() => 
-    loadFromStorage(SETTINGS_KEY, {
+  // Initialize state with default values to prevent hydration mismatch
+  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
+  const [settings, setSettings] = useState<CalculationSettings>({
+    vesselSpeed: 6,
+    fuelConsumption: 100,
+    fuelPrice: 5.5,
+    units: "imperial"
+  });
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [marinas, setMarinas] = useState<Marina[]>([]);
+  const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
+
+  // Load data from localStorage after hydration to prevent mismatch
+  useEffect(() => {
+    setIsHydrated(true);
+    setWaypoints(loadFromStorage(WAYPOINTS_KEY, []));
+    setSettings(loadFromStorage(SETTINGS_KEY, {
       vesselSpeed: 6,
       fuelConsumption: 100,
       fuelPrice: 5.5,
       units: "imperial"
-    })
-  );
-  const [marinas, setMarinas] = useState<Marina[]>([]);
-  const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
+    }));
+  }, []);
 
-  // Save waypoints to localStorage whenever they change
+  // Save waypoints to localStorage whenever they change (only after hydration)
   useEffect(() => {
-    saveToStorage(WAYPOINTS_KEY, waypoints);
-  }, [waypoints]);
+    if (isHydrated) {
+      saveToStorage(WAYPOINTS_KEY, waypoints);
+    }
+  }, [waypoints, isHydrated]);
 
-  // Save settings to localStorage whenever they change
+  // Save settings to localStorage whenever they change (only after hydration)
   useEffect(() => {
-    saveToStorage(SETTINGS_KEY, settings);
-  }, [settings]);
+    if (isHydrated) {
+      saveToStorage(SETTINGS_KEY, settings);
+    }
+  }, [settings, isHydrated]);
 
   const addWaypoint = useCallback((lng: number, lat: number) => {
     setWaypoints(prev => {

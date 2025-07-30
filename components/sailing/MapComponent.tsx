@@ -40,10 +40,15 @@ export function MapComponent({
     currentWaypoints.current = waypoints;
   }, [waypoints]);
 
-  // Initialize Mapbox token
+  // Initialize Mapbox token from environment variable
   useEffect(() => {
     try {
-      setMapboxToken("pk.eyJ1IjoiYWxvbmdzaWRleWFjaHRzIiwiYSI6ImNtZG9wZjQxeTAzcnMybXM5OTZ1NHJ1ZGYifQ.p-EJW0oDtDlpdaFxhq14yA");
+      const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+      if (!token) {
+        setMapError("Mapbox token not found. Please check your environment variables.");
+        return;
+      }
+      setMapboxToken(token);
     } catch (error) {
       setMapError("Failed to initialize map configuration");
     }
@@ -357,7 +362,7 @@ export function MapComponent({
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/alongsideyachts/cmdki7mng000l01si77fv8p5x",
+        style: "mapbox://styles/alongsideyachts/cley4k7w8000o01o63hs1c6c5",
         center: [-74.5, 40],
         zoom: 2,
         maxZoom: 9.6,
@@ -391,9 +396,9 @@ export function MapComponent({
           
           // Force reflow
           if (actualMapContainer) {
-            actualMapContainer.offsetHeight;
+            void actualMapContainer.offsetHeight;
           }
-          mapContainer.current.offsetHeight;
+          void mapContainer.current.offsetHeight;
           
           const containerToMeasure = actualMapContainer || mapContainer.current;
           const containerRect = containerToMeasure.getBoundingClientRect();

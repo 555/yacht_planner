@@ -22,7 +22,7 @@ export function CalculatorControls({
   const setUnits = (newUnits: "imperial" | "metric") => {
     if (newUnits === settings.units) return;
     
-    let newSettings: CalculationSettings = { ...settings, units: newUnits };
+    const newSettings: CalculationSettings = { ...settings, units: newUnits };
     
     if (newUnits === "metric") {
       // Converting from imperial to metric
