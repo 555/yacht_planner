@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:production": "node scripts/deploy-config.cjs enable && next build",
+    "build:production": "node scripts/deploy-config.cjs enable && next build && rm -rf .next/cache",
     "start": "next start",
     "lint": "next lint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
