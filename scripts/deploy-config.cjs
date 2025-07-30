@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Deploy Configuration Script
- * Automatically enables edge runtime for production deployment to Webflow Cloud
+ * Deploy Configuration Script for Pages Router
+ * Automatically enables edge runtime for production deployment to CloudFlare Pages
+ * Updated: 2025-01-30 - Fixed for Pages Router structure
  */
 
 const fs = require('fs');
@@ -17,7 +18,11 @@ const API_ROUTES = [
 
 function enableEdgeRuntime() {
   try {
+    console.log('🔧 Deploy Config: Pages Router Structure (Updated 2025-01-30)');
+    console.log('📁 API Routes to process:', API_ROUTES.length);
+    
     API_ROUTES.forEach(routePath => {
+      console.log(`📂 Checking: ${routePath}`);
       if (fs.existsSync(routePath)) {
         let content = fs.readFileSync(routePath, 'utf8');
         
@@ -29,11 +34,15 @@ function enableEdgeRuntime() {
         
         fs.writeFileSync(routePath, content);
         console.log(`✅ Edge runtime enabled for ${path.basename(routePath)}`);
+      } else {
+        console.log(`⚠️  File not found: ${routePath}`);
       }
     });
-    console.log('✅ Edge runtime enabled for production deployment');
+    console.log('✅ Edge runtime enabled for production deployment (Pages Router)');
   } catch (error) {
     console.error('❌ Failed to enable edge runtime:', error.message);
+    console.error('📁 Working directory:', process.cwd());
+    console.error('📂 Script directory:', __dirname);
     process.exit(1);
   }
 }
