@@ -4,13 +4,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import '../styles/globals.css';
-// Import DevLink CSS but handle missing files gracefully
-try {
-  require('@/devlink/global.css');
-} catch {
-  // DevLink CSS not available, skip
-}
 import 'mapbox-gl/dist/mapbox-gl.css';
+
+// Import DevLink CSS but handle missing files gracefully
+if (typeof window === 'undefined') {
+  // Server-side: try to require DevLink CSS
+  try {
+    require('../devlink/global.css');
+  } catch {
+    // DevLink CSS not available, skip
+  }
+} else {
+  // Client-side: dynamically import DevLink CSS
+  import('../devlink/global.css').catch(() => {
+    // DevLink CSS not available, skip
+  });
+}
 
 // Simple fallback provider that just passes through children
 const DefaultProvider = ({ children, ...props }: any) => {
@@ -20,7 +29,7 @@ const DefaultProvider = ({ children, ...props }: any) => {
 // Try to import DevLink provider, fall back to default
 let DevLinkProvider: any;
 try {
-  DevLinkProvider = require('@/devlink/DevLinkProvider').DevLinkProvider;
+  DevLinkProvider = require('./devlink/DevLinkProvider').DevLinkProvider;
 } catch {
   DevLinkProvider = DefaultProvider;
 }
