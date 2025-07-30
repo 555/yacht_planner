@@ -9,28 +9,50 @@ interface DevLinkComponentProps {
   [key: string]: any;
 }
 
-// Dynamic DevLink component loader with fallbacks
+// Map of known DevLink components to avoid dynamic imports
+const getDevLinkComponent = (componentName: string) => {
+  try {
+    switch (componentName) {
+      case 'Locations':
+        return require('../devlink/Locations').Locations;
+      case 'Footer':
+        return require('../devlink/Footer').Footer;
+      case 'MainNavigation':
+        return require('../devlink/MainNavigation').MainNavigation;
+      case 'Divider':
+        return require('../devlink/Divider').Divider;
+      case 'GlobalStyles':
+        return require('../devlink/GlobalStyles').GlobalStyles;
+      default:
+        return null;
+    }
+  } catch {
+    return null;
+  }
+};
+
+// DevLink component loader with fallbacks
 export function DevLinkComponent({ 
   componentName, 
   fallback = null, 
   children,
   ...props 
 }: DevLinkComponentProps) {
-  try {
-    // Try to dynamically import the DevLink component
-    const Component = require(`@/devlink/${componentName}`)[componentName];
-    return <Component {...props}>{children}</Component>;
-  } catch (error) {
+  const Component = getDevLinkComponent(componentName);
+  
+  if (!Component) {
     // DevLink component not available, use fallback
     console.log(`DevLink component ${componentName} not available, using fallback`);
     return <>{fallback || children}</>;
   }
+  
+  return <Component {...props}>{children}</Component>;
 }
 
 // Hook for checking DevLink availability
 export function useDevLinkAvailable() {
   try {
-    require('@/devlink/DevLinkProvider');
+    require('../devlink/DevLinkProvider');
     return true;
   } catch {
     return false;
@@ -38,7 +60,7 @@ export function useDevLinkAvailable() {
 }
 
 // Higher-order component for DevLink pages
-export function withDevLink<T extends {}>(
+export function withDevLink<T extends object>(
   Component: React.ComponentType<T>,
   fallback: ReactNode = <div>DevLink components not available</div>
 ) {

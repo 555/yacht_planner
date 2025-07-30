@@ -6,20 +6,7 @@ import { useState } from "react";
 import '../styles/globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Import DevLink CSS but handle missing files gracefully
-if (typeof window === 'undefined') {
-  // Server-side: try to require DevLink CSS
-  try {
-    require('../devlink/global.css');
-  } catch {
-    // DevLink CSS not available, skip
-  }
-} else {
-  // Client-side: dynamically import DevLink CSS
-  import('../devlink/global.css').catch(() => {
-    // DevLink CSS not available, skip
-  });
-}
+// DevLink CSS is handled by the components themselves when available
 
 // Simple fallback provider that just passes through children
 const DefaultProvider = ({ children, ...props }: any) => {
