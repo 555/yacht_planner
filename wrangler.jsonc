@@ -8,7 +8,7 @@
     "nodejs_compat"
   ],
   "assets": {
-    "binding": "ASSETS",
+    "binding": "STATIC_ASSETS",
     "directory": ".open-next/assets"
   },
   "observability": {
