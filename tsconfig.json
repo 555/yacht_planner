@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/devlink/*": [
+        "./devlink/*"
       ]
     },
     "noImplicitAny": false,

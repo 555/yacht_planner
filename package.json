@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "dev:clean": "node scripts/deploy-config.cjs disable && npm run dev"
+    "dev:clean": "node scripts/deploy-config.cjs disable && npm run dev",
+    "test:webflow": "node scripts/test-webflow-api.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -72,6 +73,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
+    "dotenv": "^17.2.1",
     "eslint": "^9.9.0",
     "eslint-config-next": "^15.1.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

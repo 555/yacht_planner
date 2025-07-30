@@ -25,6 +25,7 @@ export function MapComponent({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<Map<number, mapboxgl.Marker>>(new Map());
+  const marinaMarkers = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const [mapboxToken, setMapboxToken] = useState<string>("");
   const [mapError, setMapError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -475,6 +476,9 @@ export function MapComponent({
         if (waypoints.length > 0) {
           updateWaypoints();
         }
+        
+        // Initialize marina markers
+        updateMarinaMarkers();
       });
 
       // Comprehensive cleanup
@@ -487,6 +491,8 @@ export function MapComponent({
         window.removeEventListener('resize', handleResize);
         markers.current.forEach(marker => marker.remove());
         markers.current.clear();
+        marinaMarkers.current.forEach(marker => marker.remove());
+        marinaMarkers.current.clear();
         map.current?.remove();
       };
     } catch (error) {
@@ -495,12 +501,140 @@ export function MapComponent({
     }
   }, [mapboxToken, onAddWaypoint, isOnWater, debouncedResetTimer]);
 
+  // Create marina markers
+  const updateMarinaMarkers = useCallback(() => {
+    if (!map.current || !styleLoaded.current) return;
+
+            // Clear existing marina markers and tooltips
+        marinaMarkers.current.forEach(marker => {
+          const element = marker.getElement();
+          // Remove any tooltips that might be attached to document.body
+          const existingTooltips = document.querySelectorAll('[data-marina-tooltip]');
+          existingTooltips.forEach(tooltip => tooltip.remove());
+          marker.remove();
+        });
+        marinaMarkers.current.clear();
+
+    // Create marina markers
+    marinas.forEach((marina) => {
+      if (marina.latitude && marina.longitude) {
+        // Create marina marker element
+        const el = document.createElement('div');
+        el.className = 'marina-marker';
+        
+        // Style the marker (similar to waypoint but smaller and different color)
+        el.style.cssText = `
+          width: 28px;
+          height: 28px;
+          background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+          border: 3px solid #ffffff;
+          border-radius: 50%;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          z-index: 500;
+          position: absolute;
+          outline: none;
+          transform: translate(-50%, -50%);
+        `;
+
+        // Add marina icon (anchor emoji)
+        el.innerHTML = `
+          <div style="
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: #0284c7;
+          ">⚓</div>
+        `;
+
+        // Add tooltip (positioned below marker with fixed offset)
+        const tooltip = document.createElement('div');
+        tooltip.style.cssText = `
+          position: fixed;
+          background: rgba(0, 0, 0, 0.9);
+          color: white;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 500;
+          white-space: nowrap;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          pointer-events: none;
+          z-index: 1000;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        `;
+        tooltip.textContent = marina.name;
+        tooltip.setAttribute('data-marina-tooltip', marina.id);
+        document.body.appendChild(tooltip);
+
+        // Add hover effects (avoiding transform to prevent positioning issues)
+        el.addEventListener('mouseenter', (e) => {
+          el.style.width = '32px';
+          el.style.height = '32px';
+          el.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.4)';
+          
+          // Position tooltip relative to mouse position
+          const rect = el.getBoundingClientRect();
+          tooltip.style.left = `${rect.left + rect.width / 2}px`;
+          tooltip.style.top = `${rect.bottom + 8}px`;
+          tooltip.style.transform = 'translateX(-50%)';
+          tooltip.style.opacity = '1';
+        });
+        
+        el.addEventListener('mouseleave', () => {
+          el.style.width = '28px';
+          el.style.height = '28px';
+          el.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
+          tooltip.style.opacity = '0';
+        });
+        
+        // Click handler to add marina as waypoint
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onAddWaypoint(marina.longitude!, marina.latitude!);
+        });
+
+        // Create Mapbox marker
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'center'
+        });
+        
+        // Add to map
+        requestAnimationFrame(() => {
+          marker.setLngLat([marina.longitude!, marina.latitude!]).addTo(map.current!);
+        });
+
+        marinaMarkers.current.set(marina.id, marker);
+      }
+    });
+  }, [marinas, onAddWaypoint]);
+
   // Update waypoints when they change
   useEffect(() => {
     if (styleLoaded.current) {
       updateWaypoints();
+      updateRouteLineDisplay();
     }
-  }, [updateWaypoints]);
+  }, [waypoints, updateWaypoints]);
+
+  // Update marina markers when marinas change
+  useEffect(() => {
+    if (styleLoaded.current) {
+      updateMarinaMarkers();
+    }
+  }, [marinas, updateMarinaMarkers]);
 
   // Error state
   if (mapError) {

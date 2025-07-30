@@ -27,5 +27,8 @@ dist-ssr
 .env.local
 .env.*.local
 .next/
-.next/
 .open-next/
+
+# DevLink - ignore generated files but keep directory structure
+/devlink/*
+!/devlink/.gitkeep

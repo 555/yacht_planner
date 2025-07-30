@@ -9,15 +9,21 @@ const nextConfig: NextConfig = {
   // Configure trailing slash behavior
   trailingSlash: true,
   
-  // Configure images for Webflow Cloud compatibility
+  // Configure images for Webflow Cloud compatibility and DevLink
   images: {
     loader: 'custom',
     loaderFile: './imageLoader.js',
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "uploads-ssl.webflow.com",
+      },
+    ],
   },
   
   // Configure ESLint
   eslint: {
-    dirs: ['app', 'components', 'lib', 'types', 'utils']
+    dirs: ['pages', 'components', 'lib', 'types', 'utils']
   },
   
   // Experimental features

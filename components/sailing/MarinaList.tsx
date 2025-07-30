@@ -32,7 +32,7 @@ export default function MarinaList({ onMarinaSelect, selectedRegion }: MarinaLis
     try {
       setLoading(true);
       // Replace with your actual Webflow API endpoint
-      const response = await fetch('/api/marinas', {
+      const response = await fetch('/api/marinas/', {
         headers: {
           'Content-Type': 'application/json',
         },

@@ -5,6 +5,7 @@ import { MapComponent } from "./MapComponent";
 import { CalculatorControls } from "./CalculatorControls";
 import { RouteResults } from "./RouteResults";
 import MarinaList from "./MarinaList";
+import { SimpleMarinaDisplay } from "./SimpleMarinas";
 import { Waypoint, CalculationSettings, Marina } from "@/types/sailing";
 
 export function SailingCalculator() {
@@ -44,6 +45,13 @@ export function SailingCalculator() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [marinas, setMarinas] = useState<Marina[]>([]);
   const [selectedWaypointMarinas, setSelectedWaypointMarinas] = useState<Record<number, Marina[]>>({});
+
+  // Handle marina selection - add as waypoint
+  const handleMarinaSelect = useCallback((marina: Marina) => {
+    if (marina.latitude && marina.longitude) {
+      addWaypoint(marina.longitude, marina.latitude);
+    }
+  }, []);
 
   // Load data from localStorage after hydration to prevent mismatch
   useEffect(() => {
@@ -127,14 +135,17 @@ export function SailingCalculator() {
             }
           }}
         >
-          <MapComponent
-            waypoints={waypoints}
-            onAddWaypoint={addWaypoint}
-            onUpdateWaypoint={updateWaypoint}
-            onRemoveWaypoint={removeWaypoint}
-            marinas={marinas}
-            selectedWaypointMarinas={selectedWaypointMarinas}
-          />
+                          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                  <MapComponent
+                    waypoints={waypoints}
+                    onAddWaypoint={addWaypoint}
+                    onUpdateWaypoint={updateWaypoint}
+                    onRemoveWaypoint={removeWaypoint}
+                    marinas={marinas}
+                    selectedWaypointMarinas={selectedWaypointMarinas}
+                  />
+                  <SimpleMarinaDisplay onMarinaSelect={handleMarinaSelect} />
+                </div>
         </div>
         
         <div className="space-y-6 overflow-scroll">

@@ -6,10 +6,16 @@ export interface Waypoint {
 }
 
 export interface Marina {
+  id?: string;
   name: string;
-  latitude: number;
-  longitude: number;
-  country: string;
+  latitude?: number;
+  longitude?: number;
+  description?: string;
+  facilities?: string[];
+  contact?: string;
+  website?: string;
+  region?: string;
+  country?: string;
   distance?: number;
 }
 

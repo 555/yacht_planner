@@ -6,20 +6,19 @@
 3. Go to **General** tab
 4. Copy the **Site ID** from the Site Info section
 
-## 2. Create Marina Collection
-1. In Webflow Designer, go to **CMS** tab
-2. Click **+ Create Collection**
-3. Name it "Marinas"
-4. Add these fields:
-   - **name** (Single line text) - Required
-   - **latitude** (Number)
-   - **longitude** (Number) 
-   - **description** (Multi-line text)
-   - **facilities** (Multi-select or Tags)
-   - **contact** (Single line text)
-   - **website** (Link)
-   - **region** (Single line text)
-5. Copy the **Collection ID** from the collection settings
+## 2. Use Existing "Locations" Collection
+Your existing "Locations" collection will be used for marina data.
+- **Collection Name**: "Locations" 
+- **Collection ID**: `6594a0e49ab7a11567a87669`
+- **Expected fields** (the API will work with whatever fields exist):
+   - **name** (Single line text) - Primary field
+   - **latitude** (Number) - For map positioning
+   - **longitude** (Number) - For map positioning
+   - **description** (Multi-line text) - Optional
+   - **facilities** (Multi-select or Tags) - Optional
+   - **contact** (Single line text) - Optional
+   - **website** (Link) - Optional
+   - **region** (Single line text) - Optional for filtering
 
 ## 3. Get API Token
 1. Go to [Webflow Account → Apps & Integrations](https://webflow.com/dashboard/account/apps)
@@ -39,12 +38,17 @@
 ### Local Development (.env.local):
 ```bash
 WEBFLOW_API_TOKEN=your_api_token_here
-WEBFLOW_SITE_ID=your_site_id_here  
-WEBFLOW_MARINA_COLLECTION_ID=your_collection_id_here
+WEBFLOW_SITE_ID=65142014c5bb2454cd8c825b  
+WEBFLOW_MARINA_COLLECTION_ID=6594a0e49ab7a11567a87669
 ```
 
 ### Production (Webflow Cloud Dashboard):
-Add the same variables in your environment settings, marking the API token as "Secret".
+Add these variables in your Webflow Cloud environment settings:
+```bash
+WEBFLOW_API_TOKEN=your_api_token_here  # Mark as "Secret"
+WEBFLOW_SITE_ID=65142014c5bb2454cd8c825b
+WEBFLOW_MARINA_COLLECTION_ID=6594a0e49ab7a11567a87669
+```
 
 ## 5. Test Your Setup
 ```bash
@@ -53,11 +57,10 @@ npm run dev
 # The marina list should load (or show an error if not configured)
 ```
 
-## 6. Add Sample Marina Data
-In your Webflow CMS, add a few sample marinas to test:
-- **Name**: "Marina Bay"
-- **Latitude**: 37.7749
-- **Longitude**: -122.4194
-- **Description**: "Beautiful marina in the bay"
-- **Facilities**: ["Fuel", "WiFi", "Restaurant"]
-- **Region**: "San Francisco Bay" 
+## 6. Verify Your Existing Location Data
+Your "Locations" collection should already contain marina/location data with:
+- **Name**: Location names
+- **Latitude/Longitude**: GPS coordinates for map positioning
+- **Other fields**: Any additional details (description, facilities, etc.)
+
+The API will automatically work with whatever fields exist in your collection. 
