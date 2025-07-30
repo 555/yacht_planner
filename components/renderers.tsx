@@ -11,7 +11,7 @@ export const LinkRenderer: RenderLink = ({
   target,
   preload,
   ...props
-}) => (
+}: RenderLinkProps) => (
   <Link 
     href={href} 
     className={className} 
@@ -23,7 +23,7 @@ export const LinkRenderer: RenderLink = ({
   </Link>
 );
 
-export const ImageRenderer: RenderImage = ({
+export const ImageRenderer = ({
   src,
   alt,
   height,
@@ -31,7 +31,7 @@ export const ImageRenderer: RenderImage = ({
   loading,
   className,
   ...props
-}) => {
+}: RenderImageProps) => {
   const imgProps = {
     loading,
     className,
