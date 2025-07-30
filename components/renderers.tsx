@@ -2,9 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { RenderLink, RenderImage } from "@/devlink/devlinkContext";
+import { ReactNode } from "react";
 
-export const LinkRenderer: RenderLink = ({
+// DevLink types - fallback if DevLink isn't available
+type RenderLinkProps = {
+  href: string;
+  className?: string;
+  children: ReactNode;
+  target?: "_self" | "_blank";
+  preload?: "none" | "prefetch" | "prerender";
+  [key: string]: any;
+};
+
+type RenderImageProps = {
+  src: string | any;
+  alt?: string;
+  height?: number | string;
+  width?: number | string;
+  loading?: "lazy" | "eager";
+  className?: string;
+  [key: string]: any;
+};
+
+export const LinkRenderer = ({
   href,
   className,
   children,
