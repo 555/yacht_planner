@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { MapComponent } from "./MapComponent";
 import { CalculatorControls } from "./CalculatorControls";
 import { RouteResults } from "./RouteResults";
+import MarinaList from "./MarinaList";
 import { Waypoint, CalculationSettings, Marina } from "@/types/sailing";
 
 export function SailingCalculator() {
@@ -148,6 +149,16 @@ export function SailingCalculator() {
             onRemoveWaypoint={removeWaypoint}
             onClearRoute={clearRoute}
             selectedWaypointMarinas={selectedWaypointMarinas}
+          />
+          
+          <MarinaList 
+            onMarinaSelect={(marina) => {
+              // Add marina as a waypoint
+              if (marina.latitude && marina.longitude) {
+                addWaypoint(marina.longitude, marina.latitude);
+              }
+            }}
+            selectedRegion={waypoints.length > 0 ? 'Current Area' : undefined}
           />
         </div>
       </div>

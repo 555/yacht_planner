@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:production": "node scripts/deploy-config.cjs enable && next build",
     "start": "next start",
     "lint": "next lint",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview"
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "dev:clean": "node scripts/deploy-config.cjs disable && npm run dev"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
