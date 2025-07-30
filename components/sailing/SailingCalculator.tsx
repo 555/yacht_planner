@@ -143,6 +143,7 @@ export function SailingCalculator() {
                     onRemoveWaypoint={removeWaypoint}
                     marinas={marinas}
                     selectedWaypointMarinas={selectedWaypointMarinas}
+                    onFetchMarinas={fetchMarinas}
                   />
                   <SimpleMarinaDisplay onMarinaSelect={handleMarinaSelect} />
                 </div>

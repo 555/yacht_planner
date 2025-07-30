@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+interface CloudflareEnv {
+  DB: D1Database;
+}
+
 // Edge runtime is required for Webflow Cloud deployment
 // Comment out the line below for local development to avoid warnings
 // export const runtime = 'edge';
@@ -10,12 +14,83 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { region } = req.query;
+    const { region, bounds } = req.query;
     
-    // Get Webflow Data API token
-    const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
-    const SITE_ID = process.env.WEBFLOW_SITE_ID;
-    const COLLECTION_ID = process.env.WEBFLOW_MARINA_COLLECTION_ID;
+    // Check if we have D1 database (CloudFlare deployment)
+    const env = process.env as unknown as CloudflareEnv;
+    if (env.DB) {
+      return handleD1Query(req, res, env);
+    }
+    
+    // Fallback to Webflow API for local development
+    return handleWebflowQuery(req, res);
+  } catch (error) {
+    console.error('Marina API error:', error);
+    return res.status(500).json({ 
+      error: 'Failed to fetch marinas',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      help: 'Check console logs for detailed error information'
+    });
+  }
+}
+
+async function handleD1Query(req: NextApiRequest, res: NextApiResponse, env: CloudflareEnv) {
+  const { region, bounds } = req.query;
+  
+  let query = 'SELECT * FROM marinas WHERE 1=1';
+  const params: any[] = [];
+  
+  // Filter by region if provided
+  if (region && typeof region === 'string') {
+    query += ' AND region = ?';
+    params.push(region);
+  }
+  
+  // Filter by bounds if provided (format: "minLat,minLng,maxLat,maxLng")
+  if (bounds && typeof bounds === 'string') {
+    const [minLat, minLng, maxLat, maxLng] = bounds.split(',').map(Number);
+    if (minLat && minLng && maxLat && maxLng) {
+      query += ' AND latitude BETWEEN ? AND ? AND longitude BETWEEN ? AND ?';
+      params.push(minLat, maxLat, minLng, maxLng);
+    }
+  }
+  
+  query += ' LIMIT 500'; // Reasonable limit for map display
+  
+  const result = await env.DB.prepare(query).bind(...params).all();
+  
+  const marinas = result.results?.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    description: row.description,
+    facilities: row.facilities ? JSON.parse(row.facilities) : [],
+    contact: row.contact,
+    website: row.website,
+    region: row.region
+  })) || [];
+  
+  return res.status(200).json({
+    items: marinas,
+    total: marinas.length,
+    source: 'sqlite',
+    debug: {
+      query,
+      paramCount: params.length,
+      hasItems: !!result.results,
+      itemCount: result.results?.length || 0
+    }
+  });
+}
+
+async function handleWebflowQuery(req: NextApiRequest, res: NextApiResponse) {
+  const { region } = req.query;
+  
+  // Get Webflow Data API token
+  const WEBFLOW_API_TOKEN = process.env.WEBFLOW_API_TOKEN;
+  const SITE_ID = process.env.WEBFLOW_SITE_ID;
+  const COLLECTION_ID = process.env.WEBFLOW_MARINA_COLLECTION_ID;
     
     if (!WEBFLOW_API_TOKEN) {
       return res.status(500).json({ 
@@ -109,19 +184,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       items: marinas,
       total: data.items?.length || 0,
+      source: 'webflow',
       debug: {
         apiUrl,
         hasItems: !!data.items,
         itemCount: data.items?.length || 0
       }
     });
-
-  } catch (error) {
-    console.error('Marina API error:', error);
-    return res.status(500).json({ 
-      error: 'Failed to fetch marinas',
-      details: error instanceof Error ? error.message : 'Unknown error',
-      help: 'Check console logs for detailed error information'
-    });
-  }
 } 

@@ -12,5 +12,13 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "yacht_planner_db",
+      "database_id": "placeholder-will-be-assigned-on-deployment",
+      "migrations_dir": "./migrations"
+    }
+  ]
 }

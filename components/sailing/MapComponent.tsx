@@ -12,6 +12,7 @@ interface MapComponentProps {
   onRemoveWaypoint: (id: number) => void;
   marinas: Marina[];
   selectedWaypointMarinas: Record<number, Marina[]>;
+  onFetchMarinas?: (bounds: { minLat: number; minLng: number; maxLat: number; maxLng: number }) => void;
 }
 
 export function MapComponent({
@@ -20,7 +21,8 @@ export function MapComponent({
   onUpdateWaypoint,
   onRemoveWaypoint,
   marinas,
-  selectedWaypointMarinas
+  selectedWaypointMarinas,
+  onFetchMarinas
 }: MapComponentProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -35,6 +37,8 @@ export function MapComponent({
   const recentlyDragged = useRef<Set<number>>(new Set());
   const currentWaypoints = useRef<Waypoint[]>(waypoints);
   const lastResetTime = useRef<number>(0);
+  const lastBoundsUpdate = useRef<number>(0);
+  const currentBounds = useRef<mapboxgl.LngLatBounds | null>(null);
 
   // Keep waypoints ref updated
   useEffect(() => {
@@ -471,6 +475,30 @@ export function MapComponent({
         map.current?.on("zoom", debouncedResetTimer);
         map.current?.on("pitch", debouncedResetTimer);
         map.current?.on("rotate", debouncedResetTimer);
+        
+        // Dynamic marina loading on map move/zoom
+        const handleMapMove = () => {
+          const now = Date.now();
+          if (now - lastBoundsUpdate.current < 1000) return; // Debounce 1 second
+          
+          lastBoundsUpdate.current = now;
+          
+          if (onFetchMarinas && map.current) {
+            const bounds = map.current.getBounds();
+            const sw = bounds.getSouthWest();
+            const ne = bounds.getNorthEast();
+            
+            onFetchMarinas({
+              minLat: sw.lat,
+              minLng: sw.lng,
+              maxLat: ne.lat,
+              maxLng: ne.lng
+            });
+          }
+        };
+        
+        map.current?.on("moveend", handleMapMove);
+        map.current?.on("zoomend", handleMapMove);
         
         // Initialize waypoints if present
         if (waypoints.length > 0) {
