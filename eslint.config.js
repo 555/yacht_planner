@@ -2,6 +2,7 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReact from "eslint-plugin-react";
+import nextPlugin from "@next/eslint-plugin-next";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -16,6 +17,14 @@ export default [
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
+    plugins: {
+      "@next/next": nextPlugin
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules
+    }
+  },
+  {
     settings: {
       react: {
         version: "detect"
@@ -25,6 +34,7 @@ export default [
       // TypeScript rules
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-unused-expressions": [
         "error",
         {
@@ -36,7 +46,8 @@ export default [
       // React rules - disable for Next.js 15.3 and React 17+ JSX transform
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/no-unknown-property": "off"
+      "react/no-unknown-property": "off",
+      "react/display-name": "off"
     }
   }
 ];
