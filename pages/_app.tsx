@@ -2,31 +2,51 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import '../styles/globals.css';
 import '@/devlink/global.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
-// DevLink imports with fallback
-let DevLinkProvider: any;
-let LinkRenderer: any;
-let ImageRenderer: any;
 
-try {
-  const devlinkModule = require('@/devlink/DevLinkProvider');
-  DevLinkProvider = devlinkModule.DevLinkProvider;
-  
-  const renderersModule = require('@/components/renderers');
-  LinkRenderer = renderersModule.LinkRenderer;
-  ImageRenderer = renderersModule.ImageRenderer;
-} catch {
-  // DevLink not available, use fallback
-  DevLinkProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-  LinkRenderer = undefined;
-  ImageRenderer = undefined;
-}
+// Fallback DevLink Provider
+const FallbackDevLinkProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+FallbackDevLinkProvider.displayName = 'DevLinkProviderFallback';
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
+  const [DevLinkProvider, setDevLinkProvider] = useState<any>(FallbackDevLinkProvider);
+  const [renderers, setRenderers] = useState<{LinkRenderer?: any, ImageRenderer?: any}>({});
+
+  useEffect(() => {
+    // Try to load DevLink components dynamically
+    const loadDevLink = async () => {
+      try {
+        const [devlinkModule, renderersModule] = await Promise.all([
+          import('@/devlink/DevLinkProvider').catch(() => null),
+          import('@/components/renderers').catch(() => null)
+        ]);
+        
+        if (devlinkModule?.DevLinkProvider) {
+          setDevLinkProvider(() => devlinkModule.DevLinkProvider);
+        }
+        
+        if (renderersModule?.LinkRenderer && renderersModule?.ImageRenderer) {
+          setRenderers({
+            LinkRenderer: renderersModule.LinkRenderer,
+            ImageRenderer: renderersModule.ImageRenderer
+          });
+        }
+      } catch (error) {
+        // DevLink not available, use fallback
+        console.log('DevLink not available, using fallback provider');
+      }
+    };
+
+    loadDevLink();
+  }, []);
+
+  const providerProps = renderers.LinkRenderer && renderers.ImageRenderer 
+    ? { renderLink: renderers.LinkRenderer, renderImage: renderers.ImageRenderer }
+    : {};
 
   return (
     <>
@@ -38,9 +58,7 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-                 <DevLinkProvider 
-             {...(LinkRenderer && ImageRenderer ? { renderLink: LinkRenderer, renderImage: ImageRenderer } : {})}
-           >
+      <DevLinkProvider {...providerProps}>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <Component {...pageProps} />
