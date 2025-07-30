@@ -1,5 +1,7 @@
 # Welcome to your Lovable project
 
+<!-- Build trigger: 2025-01-30 - All DevLink issues resolved -->
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/5014e85f-dd61-4981-a7d3-3ad77c032da0
