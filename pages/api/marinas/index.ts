@@ -6,7 +6,7 @@ interface CloudflareEnv {
 
 // Edge runtime is required for Webflow Cloud deployment
 // Comment out the line below for local development to avoid warnings
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
