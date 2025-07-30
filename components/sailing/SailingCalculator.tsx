@@ -53,6 +53,26 @@ export function SailingCalculator() {
     }
   }, []);
 
+  // Fetch marinas function with optional bounds
+  const fetchMarinas = async (bounds?: { minLat: number; minLng: number; maxLat: number; maxLng: number }) => {
+    try {
+      let url = '/api/marinas/';
+      if (bounds) {
+        const boundsParam = `${bounds.minLat},${bounds.minLng},${bounds.maxLat},${bounds.maxLng}`;
+        url += `?bounds=${encodeURIComponent(boundsParam)}`;
+      }
+      
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setMarinas(data.items || []);
+        console.log(`Loaded ${data.items?.length || 0} marinas from ${data.source || 'unknown'}`);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch marinas:', error);
+    }
+  };
+
   // Load data from localStorage after hydration to prevent mismatch
   useEffect(() => {
     setIsHydrated(true);
@@ -63,6 +83,9 @@ export function SailingCalculator() {
       fuelPrice: 5.5,
       units: "imperial"
     }));
+    
+    // Fetch marinas from API
+    fetchMarinas(); // Call fetchMarinas here
   }, []);
 
   // Save waypoints to localStorage whenever they change (only after hydration)

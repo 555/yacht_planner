@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Check sync status from database
     const result = await env.DB.prepare(
       'SELECT * FROM sync_status ORDER BY last_sync_at DESC LIMIT 1'
-    ).first();
+    ).first() as any;
 
     if (!result) {
       return res.status(200).json({
